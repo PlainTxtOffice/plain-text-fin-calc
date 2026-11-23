@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Plain Text Fin Calc</string>
+    <string name="history_empty">Results appear here.\nTap one to reuse it.</string>
+    <string name="history_description">Calculation history. Tap a result to reuse it.</string>
+    <string name="history_result">= %1$s</string>
+    <string name="history_entry_description">%1$s equals %2$s. Tap to reuse.</string>
+    <string name="settings_title">Settings</string>
+    <plurals name="settings_precision">
+        <item quantity="one">Calculations and stored results: %1$d significant digit</item>
+        <item quantity="other">Calculations and stored results: %1$d significant digits</item>
+    </plurals>
+    <string name="settings_precision_explanation">Significant digits count across the whole number. Saved results retain calculation precision when reused.</string>
+    <string name="settings_decimal_places">Decimal places shown</string>
+    <string name="settings_all_digits">All stored digits</string>
+    <string name="settings_rounding_explanation">Applies to results shown in the calculator and history. Display rounding does not change saved results or later calculations.</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_unlimited_history">Unlimited history</string>
+    <string name="settings_history_limit">Maximum history entries (1–10,000)</string>
+    <string name="settings_history_limit_description">Maximum history entries</string>
+    <string name="settings_history_limit_error">Enter a whole number from 1 to 10,000</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+</resources>

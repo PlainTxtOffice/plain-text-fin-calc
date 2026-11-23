@@ -1,0 +1,90 @@
+name: iOS build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths: ["platform/ios/**", ".github/workflows/ios-build.yml"]
+  pull_request:
+    paths: ["platform/ios/**", ".github/workflows/ios-build.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      # Repository variables: project/workspace path relative to platform/ios,
+      # and the committed shared scheme. See workflows/README.md.
+      IOS_PROJECT: ${{ vars.IOS_PROJECT }}
+      IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Check for iOS project
+        id: project
+        run: |
+          project=$(find platform/ios -type d \( -name '*.xcodeproj' -o -name '*.xcworkspace' \) -print -quit 2>/dev/null || true)
+          if [[ -z "$project" && -z "$IOS_PROJECT" ]]; then
+            echo "::notice::No Xcode project yet; iOS build skipped."
+            echo "iOS build skipped: add an Xcode project and configure IOS_PROJECT and IOS_SCHEME." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [[ -z "$IOS_PROJECT" || -z "$IOS_SCHEME" ]]; then
+            echo "::error::Set repository variables IOS_PROJECT and IOS_SCHEME for this app."
+            exit 1
+          fi
+          case "$IOS_PROJECT" in
+            *.xcworkspace) kind=workspace ;;
+            *.xcodeproj) kind=project ;;
+            *) echo "::error::IOS_PROJECT must name an .xcodeproj or .xcworkspace."; exit 1 ;;
+          esac
+          test -d "platform/ios/$IOS_PROJECT"
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build for iOS Simulator
+        if: steps.project.outputs.ready == 'true'
+        working-directory: platform/ios
+        env:
+          PROJECT_KIND: ${{ steps.project.outputs.kind }}
+        run: |
+          xcodebuild -version
+          xcodebuild "-$PROJECT_KIND" "$IOS_PROJECT" -scheme "$IOS_SCHEME" \
+            -configuration Debug -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/derived-data CODE_SIGNING_ALLOWED=NO build
+
+      - name: Package Simulator applications
+        if: steps.project.outputs.ready == 'true'
+        working-directory: platform/ios
+        run: |
+          shopt -s nullglob
+          apps=(build/derived-data/Build/Products/Debug-iphonesimulator/*.app)
+          if (( ${#apps[@]} == 0 )); then
+            echo "::error::No Simulator application was produced."
+            exit 1
+          fi
+          # Archive first so app permissions and symlinks survive artifact upload.
+          tar -czf build/ios-simulator.tar.gz "${apps[@]}"
+
+      - name: Upload Simulator build
+        if: steps.project.outputs.ready == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ${{ github.event.repository.name }}-ios-simulator-${{ runner.arch }}
+          path: platform/ios/build/ios-simulator.tar.gz
+          if-no-files-found: error
+          retention-days: 30

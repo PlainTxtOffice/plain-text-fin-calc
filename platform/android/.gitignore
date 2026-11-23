@@ -1,0 +1,11 @@
+.gradle/
+.kotlin/
+.idea/
+local.properties
+build/
+app/release/
+/keystore.properties
+*.jks
+*.keystore
+/profiling/
+/problems/

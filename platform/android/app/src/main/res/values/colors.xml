@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The one palette for both themes: ThemeColors reads it for the calculator, styles.xml for dialogs. -->
+<resources>
+    <color name="dark_background">#191D23</color>
+    <color name="dark_surface">#222831</color>
+    <color name="dark_key">#303945</color>
+    <color name="dark_text">#EFF4FA</color>
+    <color name="dark_muted">#A0ACBC</color>
+    <color name="dark_accent">#81D4FA</color>
+
+    <color name="light_background">#F2F5F9</color>
+    <color name="light_surface">#FFFFFF</color>
+    <color name="light_key">#E0E7F0</color>
+    <color name="light_text">#182231</color>
+    <color name="light_muted">#586476</color>
+    <color name="light_accent">#0069A0</color>
+</resources>

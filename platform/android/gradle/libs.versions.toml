@@ -1,0 +1,17 @@
+[versions]
+agp = "9.5.1"
+activity = "1.13.0"
+lifecycle = "2.11.0"
+recyclerview = "1.4.0"
+gson = "2.15.0"
+junit = "4.13.2"
+
+[libraries]
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

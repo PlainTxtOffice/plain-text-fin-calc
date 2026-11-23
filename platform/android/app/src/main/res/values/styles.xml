@@ -1,0 +1,42 @@
+<resources>
+    <!-- Dark is the default; MainActivity switches to the Light variants in code. -->
+    <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="android:colorBackgroundFloating">@color/dark_surface</item>
+        <item name="android:colorAccent">@color/dark_accent</item>
+        <item name="android:colorButtonNormal">@color/dark_key</item>
+        <item name="android:colorControlNormal">@color/dark_muted</item>
+        <item name="android:textColorPrimary">@color/dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/dark_muted</item>
+    </style>
+    <style name="AppTheme.Light" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/light_background</item>
+        <item name="android:colorBackground">@color/light_background</item>
+        <item name="android:colorBackgroundFloating">@color/light_surface</item>
+        <item name="android:colorAccent">@color/light_accent</item>
+        <item name="android:colorButtonNormal">@color/light_key</item>
+        <item name="android:colorControlNormal">@color/light_muted</item>
+        <item name="android:textColorPrimary">@color/light_text_primary</item>
+        <item name="android:textColorSecondary">@color/light_muted</item>
+    </style>
+    <!-- Menus and dialogs opened from the calculator. -->
+    <style name="AppDialog" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorBackgroundFloating">@color/dark_surface</item>
+        <item name="android:colorAccent">@color/dark_accent</item>
+        <item name="android:colorControlNormal">@color/dark_muted</item>
+        <item name="android:textColorPrimary">@color/dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/dark_muted</item>
+    </style>
+    <style name="AppDialog.Light" parent="android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorBackgroundFloating">@color/light_surface</item>
+        <item name="android:colorAccent">@color/light_accent</item>
+        <item name="android:colorControlNormal">@color/light_muted</item>
+        <item name="android:textColorPrimary">@color/light_text_primary</item>
+        <item name="android:textColorSecondary">@color/light_muted</item>
+    </style>
+</resources>

@@ -1,0 +1,75 @@
+# last updated 2026-11-19
+# Python-generated files
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+__pycache__/
+.pytest_cache/
+.pytest_tmp/
+.ruff_cache/
+.rumdl_cache/
+.mypy_cache/
+
+# Nuitka build artifacts
+*.build/
+*.dist/
+*.onefile-build/
+
+# virtual environments
+.venv**
+
+# directories
+logs/
+.agents/ptm/
+.agents/skills_export/*
+!.agents/skills_export/README.md
+.pytest-temp/
+build/
+main.build/
+main.dist/
+main.onefile-build/
+
+
+# files
+*.pdf
+*.db
+.env
+.DS_Store
+dev-docs/prompt_template.md
+ios-move-report.json
+installing_nuitka.md
+
+# Android machine-local state and private signing material.
+platform/android/**/local.properties
+platform/android/**/.gradle/
+platform/android/**/.kotlin/
+platform/android/**/*.jks
+platform/android/**/*.keystore
+
+# Xcode user settings and local build state; keep project metadata tracked.
+platform/ios/**/xcuserdata/
+platform/mac_os/**/xcuserdata/
+platform/ios/**/DerivedData/
+platform/mac_os/**/DerivedData/
+platform/ios/**/*.xcuserstate
+platform/mac_os/**/*.xcuserstate
+
+# Track Advanced Installer projects; ignore their backups and build caches.
+platform/windows/dev-docs/build_instructions/advanced_installer/*
+!platform/windows/dev-docs/build_instructions/advanced_installer/*.aip
+!platform/windows/dev-docs/build_instructions/advanced_installer/*.md
+platform/windows/dev-docs/build_instructions/advanced_installer/*.back(*).aip
+
+# Fin Calc runtime data when the Windows app runs from its project folder.
+platform/windows/data/
+platform/windows/exports/
+
+# Debug feedback pulled from a device with platform/ios/scripts/pull-dev-feedback.sh.
+platform/ios/dev-feedback/
+
+# IDE state and recorded App Review videos.
+.idea/
+*.iml
+platform/ios/build/

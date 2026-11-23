@@ -1,19 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="1024pt"
-   height="1024pt"
-   viewBox="0 0 361.24444 361.24444"
-   version="1.1"
-   id="svg1"
-   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
-   sodipodi:docname="icon.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Generated from icon.svg by scripts/make-github-readme-icon.py.
+  Do not edit by hand: change the master icon and rerun the script.
+  The master is nested unchanged inside a rounded-corner clip path
+  because GitHub strips CSS from README images.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 361.24444 361.24444" width="1024pt" height="1024pt">
+  <defs>
+    <clipPath id="github-readme-corners">
+      <rect x="0" y="0" width="361.24444" height="361.24444" rx="79.473777" ry="79.473777"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#github-readme-corners)">
+<svg viewBox="0 0 361.24444 361.24444" version="1.1" id="svg1" inkscape:version="1.4.3 (0d15f75, 2025-12-25)" sodipodi:docname="icon.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" x="0" y="0" width="361.24444" height="361.24444">
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#505050"
@@ -50,7 +49,7 @@
          offset="0"
          id="stop5" />
       <stop
-         style="stop-color:#fefefe;stop-opacity:0;"
+         style="stop-color:#10181f;stop-opacity:1;"
          offset="1"
          id="stop6" />
     </linearGradient>
@@ -79,10 +78,10 @@
        inkscape:collect="always"
        xlink:href="#linearGradient5"
        id="linearGradient6"
-       x1="0.34070674"
-       y1="180.38571"
-       x2="361.84971"
-       y2="180.38571"
+       x1="0"
+       y1="180.62222"
+       x2="361.24444"
+       y2="180.62222"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <g
@@ -92,10 +91,10 @@
     <rect
        style="fill:url(#linearGradient6);stroke:url(#linearGradient3);stroke-width:0.264583;fill-opacity:1"
        id="rect1"
-       width="361.24442"
-       height="361.24442"
-       x="0.47299823"
-       y="-0.2364963"
+       width="361.24444"
+       height="361.24444"
+       x="0"
+       y="0"
        inkscape:label="rect1" />
     <g
        sodipodi:type="inkscape:box3d"
@@ -147,5 +146,7 @@
          d="M 41.472967,191.68343 177.8807,26.472734 V 285.23922 L 41.472967,319.79683 Z"
          points="177.8807,26.472734 177.8807,285.23922 41.472967,319.79683 41.472967,191.68343 " />
     </g>
+  </g>
+</svg>
   </g>
 </svg>

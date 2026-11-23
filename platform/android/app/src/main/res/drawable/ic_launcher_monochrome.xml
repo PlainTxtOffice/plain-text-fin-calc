@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from assets/icons/icon.svg: foreground paths as an opaque silhouette.
+     The SVG background rectangle is omitted; 60 dp of artwork fits the 108 dp adaptive canvas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="361.24444"
+    android:viewportHeight="361.24444">
+    <group
+        android:scaleX="0.55555556"
+        android:scaleY="0.55555556"
+        android:translateX="80.27654222"
+        android:translateY="80.27654222">
+        <path android:fillColor="#FF000000" android:fillType="evenOdd"
+            android:pathData="m 160.29249,229.97655 158.48955,-77.62476 v 159.21792 l -158.48955,16.237 z" />
+        <path android:fillColor="#FF000000" android:fillType="evenOdd"
+            android:pathData="m 41.472967,191.68343 v 128.1134 l 118.819523,8.00988 v -97.83016 z" />
+        <path android:fillColor="#FF000000" android:fillType="evenOdd"
+            android:pathData="M 41.472967,191.68343 177.8807,26.472734 318.78204,152.35179 160.29249,229.97655 Z" />
+        <path android:fillColor="#FF000000" android:fillType="evenOdd"
+            android:pathData="m 41.472967,319.79683 136.407733,-34.55761 140.90134,26.33049 -158.48955,16.237 z" />
+        <path android:fillColor="#FF000000" android:fillType="evenOdd"
+            android:pathData="M 177.8807,26.472734 V 285.23922 l 140.90134,26.33049 V 152.35179 Z" />
+        <path android:fillColor="#FF000000" android:fillType="evenOdd"
+            android:pathData="M 41.472967,191.68343 177.8807,26.472734 V 285.23922 L 41.472967,319.79683 Z" />
+    </group>
+</vector>

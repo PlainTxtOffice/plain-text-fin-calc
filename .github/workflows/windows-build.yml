@@ -1,0 +1,53 @@
+name: Windows build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Nuitka onefile
+    needs: ci
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: platform/windows
+    env:
+      PYTHONUTF8: "1"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.14"
+
+      - name: Create virtual environment
+        run: python -m venv .venv
+
+      - name: Install project and Nuitka
+        run: .venv/Scripts/python.exe -m pip install -e . "nuitka==4.2.2" zstandard
+
+      - name: Build portable executable
+        run: ./scripts/nuitka/onefile.ps1
+
+      - name: Upload portable executable
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ${{ github.event.repository.name }}-onefile-windows-x64
+          path: platform/windows/build/onefile/Plain Text Fin Calc.exe
+          if-no-files-found: error
+          retention-days: 30

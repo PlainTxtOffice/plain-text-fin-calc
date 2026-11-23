@@ -1,31 +1,21 @@
-Fin Calc Proprietary License
+MIT License
 
-Copyright (c) 2026 Plain Text Office LLC. All rights reserved.
+Copyright (c) 2026 Plain Text Office LLC
 
-The software and accompanying documentation, excluding identified third-party
-components, are proprietary to Plain Text Office LLC.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Except as expressly authorized by Plain Text Office LLC in writing or permitted
-by applicable law, you may not use, copy, modify, reproduce, distribute, publish,
-sublicense, sell, or create derivative works of this software or documentation.
-No license to the source code is granted by possession of a copy or access to
-this repository.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Authorized use of a distributed application is governed by the separate terms
-provided by Plain Text Office LLC with that distribution. This notice does not
-expand any rights granted by those terms.
-
-Third-party components remain subject to their respective licenses and notices.
-This license does not replace or restrict rights granted under those licenses.
-It applies to versions distributed under these terms and does not alter
-licenses previously granted for earlier versions.
-
-Except as required by applicable law or expressly agreed in writing, the
-software is provided "AS IS", without warranties of any kind, express or
-implied, including warranties of merchantability, fitness for a particular
-purpose, and noninfringement.
-
-To the maximum extent permitted by applicable law, Plain Text Office LLC is not
-liable for any claim, damages, or other liability arising from the software or
-its use, whether in contract, tort, or otherwise, except as expressly provided
-in a separate written agreement.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
