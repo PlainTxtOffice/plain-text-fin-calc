@@ -1,7 +1,8 @@
 # Plain Text Fin Calc for Android
 
 Native Kotlin calculator with decimal arithmetic, reusable calculation history,
-light/dark themes, display precision settings, and CSV export.
+light/dark themes, display precision settings, an optional RPN input mode, and
+CSV export.
 
 ## Build and run
 
@@ -36,6 +37,20 @@ Enter an expression with the keypad and tap **=**. Tap a saved result to reuse
 its full precision. **C** clears input; **⌫** deletes the last character.
 Use **log**, parentheses, and a positive value for base-10 logarithms.
 
+Settings also offer an RPN (reverse Polish notation) input mode under
+**Input mode**; **Algebraic** is the default. RPN mode was added in version
+0.5.0. In RPN mode the keypad
+has **ENTER**, **x↔y** (swap), and **DROP** in place of **=** and the
+parentheses. Type a number, tap **ENTER**, type the next number, and tap an
+operator: `3 ENTER 4 +` gives 7. The display shows the X register with a
+**Y:** line for the Y register above it; the stack holds four numbers. **±**
+changes the sign of the number being typed or of X. **C** clears the number
+being typed, or the whole stack when none is being typed. Each operator and
+**log** adds a line to the tape as the equivalent expression and result, such
+as `3 + 4` and `= 7`. Tapping a saved result puts it on the stack. A key that
+needs more numbers than the stack holds shows `Too few operands`. Changing the
+input mode clears the number being entered and the stack; history is kept.
+
 The **⋮** menu contains Settings, Export History, Clear History, Send
 Feedback, Privacy Policy, and About. Send Feedback offers two choices for bug
 reports and feature requests: Email drafts a message to
@@ -43,11 +58,17 @@ reports and feature requests: Email drafts a message to
 device model, and Contact form opens `https://plaintxtoffice.com/contact/` in a
 browser. Privacy
 Policy opens the Plain Text Office privacy policy in a browser.
-Settings provide full precision or 0–6 decimal places, light/dark appearance,
-and a history limit of 1–10,000 entries or Unlimited. Export opens Android's
-document picker and writes UTF-8 CSV with `timestamp,expression,result` columns.
+Settings provide full precision or 0–6 decimal places, the input mode,
+light/dark appearance, and a history limit of 1–10,000 entries or Unlimited.
+Export opens Android's
+document picker and writes UTF-8 CSV with
+`timestamp,expression,result,rpn_input` columns. `rpn_input` holds the keys of
+a calculation made in RPN mode, such as `3 ENTER 4 +`, and is empty for
+algebraic entries.
 
-History and settings are saved in app-private `calculator.json`. Uninstalling or
+History and settings are saved in app-private `calculator.json`. The RPN stack
+is not saved there; it is kept only in the activity's saved instance state.
+Uninstalling or
 clearing app data removes them; export anything you want to retain first. The
 app requests no network or storage permissions and disables Android backup.
 Each platform keeps its own history; there is no cross-device synchronization.
@@ -65,7 +86,9 @@ and fractional powers use decimal series with guard digits; their final digit
 can differ from the Windows implementation.
 
 Unit tests cover calculation errors, history reuse, settings, failed saves,
-restart persistence, CSV escaping, and 59 reference calculations generated from
+restart persistence, CSV escaping, RPN mode (stack behavior, equality with
+algebraic results, storage, and export), and 59 reference calculations
+generated from
 `platform/windows/plain_text_fin_calc/domains/calc/evaluator.py`. The reference
 values live in `app/src/test/resources/python-reference.json`.
 
@@ -75,14 +98,14 @@ Google Play listing images and guidance are in
 [store assets](assets/store/README.md).
 
 The application ID is `com.plaintxtoffice.fincalc`; the current version is
-`0.4.0` with version code `6`. It compiles against API 37 and targets API 36.
+`0.5.0` with version code `7`. It compiles against API 37 and targets API 36.
 
 ```powershell
 .\gradlew.bat bundleRelease
 ```
 
 This creates a bundle named after the app and version, such as
-`app/build/outputs/bundle/release/plain-text-fin-calc-0.4.0-6-release.aab`.
+`app/build/outputs/bundle/release/plain-text-fin-calc-0.5.0-7-release.aab`.
 Gradle signs it when `keystore.properties` exists in `platform/android/`; copy
 `keystore.properties.example` to create it and fill in your upload key. Without
 that file the bundle is **unsigned**. Keep the key and passwords outside version
@@ -91,7 +114,8 @@ project does not include store submission credentials or upload automation.
 
 ## Source layout
 
-- `domains/calc/`: decimal arithmetic, expression input, history, formatting.
+- `domains/calc/`: decimal arithmetic, expression input, the RPN stack,
+  history, formatting.
 - `config/`: settings values.
 - `adapters/`: JSON persistence and CSV output.
 - `application/`: calculator sessions and background Android lifecycle state.

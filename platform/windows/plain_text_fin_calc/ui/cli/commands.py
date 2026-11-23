@@ -27,6 +27,14 @@ def calculate(
     expression: Annotated[
         str, typer.Argument(help="Quoted arithmetic expression.")
     ],
+    *,
+    rpn: Annotated[
+        bool,
+        typer.Option(
+            "--rpn",
+            help='Read the expression as RPN tokens, such as "3 4 +".',
+        ),
+    ] = False,
 ) -> None:
     """Evaluate an expression and save it to the calculation history.
 
@@ -34,10 +42,20 @@ def calculate(
     /, ^, parentheses, and log(x) (base 10). Use calculate -- "-2 ^ 2" for
     expressions starting with a minus sign. Text input allows 2,048 characters
     and 128 tokens. Saved results retain full precision.
+
+    With --rpn, give RPN tokens separated by spaces, for example:
+    calculate --rpn "3 4 +". Tokens are numbers, + - * / ^ and the words
+    enter, swap, drop, chs, log, clear; the last number on the stack is
+    printed.
     """
     configure_logging()
     try:
-        result = load_session().calculate(expression)
+        session = load_session()
+        result = (
+            session.calculate_rpn(expression)
+            if rpn
+            else session.calculate(expression)
+        )
     except (EvaluationError, OSError) as error:
         typer.echo(f"Error: {error}", err=True)
         raise typer.Exit(1) from error

@@ -76,3 +76,58 @@ def test_unlimited_checkbox_toggles_spinbox():
     dialog._unlimited_check.setChecked(True)
     assert not dialog._cap_spin.isEnabled()
     assert dialog.selected_settings().max_history_entries is None
+
+
+def test_dialog_preselects_input_mode():
+    _app()
+    assert SettingsDialog(Settings())._input_mode_combo.currentData() == (
+        "algebraic"
+    )
+    dialog = SettingsDialog(Settings(input_mode="rpn"))
+    combo = dialog._input_mode_combo
+    assert combo.currentData() == "rpn"
+    assert combo.currentText() == "RPN (reverse Polish notation)"
+    assert [combo.itemText(i) for i in range(combo.count())] == [
+        "Algebraic", "RPN (reverse Polish notation)",
+    ]
+
+
+def test_selected_settings_carries_input_mode_with_other_fields():
+    _app()
+    dialog = SettingsDialog(Settings(decimal_places=2, input_mode="rpn"))
+    assert dialog.selected_settings() == Settings(
+        decimal_places=2, input_mode="rpn"
+    )
+    combo = dialog._input_mode_combo
+    combo.setCurrentIndex(combo.findData("algebraic"))
+    assert dialog.selected_settings() == Settings(decimal_places=2)
+    combo.setCurrentIndex(combo.findData("rpn"))
+    assert dialog.selected_settings().input_mode == "rpn"
+
+
+def test_input_mode_row_and_explanation_text():
+    from PySide6.QtWidgets import QFormLayout, QLabel
+
+    _app()
+    dialog = SettingsDialog(Settings())
+    form = dialog.findChild(QFormLayout)
+
+    def row_label(row: int) -> str:
+        # A row added with an empty label has no label widget.
+        label = form.itemAt(row, QFormLayout.ItemRole.LabelRole)
+        return label.widget().text() if label is not None else ""
+
+    def row_field(row: int):
+        return form.itemAt(row, QFormLayout.ItemRole.FieldRole).widget()
+
+    labels = [row_label(row) for row in range(form.rowCount())]
+    assert labels[:4] == ["Decimal places:", "Input mode:", "", "Theme:"]
+    assert row_field(1) is dialog._input_mode_combo
+    assert row_field(2) is dialog._input_mode_note
+    assert dialog._input_mode_note.wordWrap()
+    assert dialog._input_mode_note.text() == (
+        "In RPN mode, numbers go onto a stack with ENTER and each operator "
+        "uses the last two numbers. Changing the input mode clears the number "
+        "being entered and the stack. History is kept."
+    )
+    assert dialog._input_mode_note in dialog.findChildren(QLabel)

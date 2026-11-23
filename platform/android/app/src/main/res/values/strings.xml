@@ -13,6 +13,10 @@
     <string name="settings_decimal_places">Decimal places shown</string>
     <string name="settings_all_digits">All stored digits</string>
     <string name="settings_rounding_explanation">Applies to results shown in the calculator and history. Display rounding does not change saved results or later calculations.</string>
+    <string name="settings_input_mode">Input mode</string>
+    <string name="settings_input_mode_algebraic">Algebraic</string>
+    <string name="settings_input_mode_rpn">RPN (reverse Polish notation)</string>
+    <string name="settings_input_mode_explanation">In RPN mode, numbers go onto a stack with ENTER and each operator uses the last two numbers. Changing the input mode clears the number being entered and the stack. History is kept.</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_light">Light</string>
@@ -20,6 +24,18 @@
     <string name="settings_history_limit">Maximum history entries (1–10,000)</string>
     <string name="settings_history_limit_description">Maximum history entries</string>
     <string name="settings_history_limit_error">Enter a whole number from 1 to 10,000</string>
+    <!-- RPN keypad. The swap label is x, a left-right arrow kept as a text glyph (U+FE0E), y. -->
+    <string name="key_swap" translatable="false">x&#x2194;&#xFE0E;y</string>
+    <string name="key_swap_description">Swap X and Y</string>
+    <string name="key_drop">DROP</string>
+    <string name="key_drop_description">Drop</string>
+    <string name="key_enter">ENTER</string>
+    <string name="key_enter_description">Enter</string>
+    <string name="rpn_y_value">Y: %1$s</string>
+    <string name="rpn_y_empty">Y:</string>
+    <string name="rpn_x_description">X register, %1$s</string>
+    <string name="rpn_y_description">Y register, %1$s</string>
+    <string name="rpn_y_description_empty">Y register, empty</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
 </resources>

@@ -5,7 +5,7 @@ from decimal import Decimal
 import pytest
 
 from plain_text_fin_calc.domains.calc.errors import EvaluationError
-from plain_text_fin_calc.domains.calc.evaluator import evaluate
+from plain_text_fin_calc.domains.calc.evaluator import evaluate, result_text
 
 
 class TestEvaluatorArithmetic:
@@ -143,3 +143,39 @@ class TestEvaluatorErrors:
     def test_multiplication_overflow_raises_evaluation_error(self):
         with pytest.raises(EvaluationError, match="[Oo]ut of range"):
             evaluate(["9", "^", "999999", "*", "9", "^", "999999"])
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("7.00", "7"),
+        ("435.00", "435"),
+        ("-1.0", "-1"),
+        ("0.30", "0.3"),
+        ("0.000015", "0.000015"),
+        ("1E+3", "1000"),
+        ("1E+28", "10000000000000000000000000000"),
+        ("1.000000000000000000000000000E+30", "1E+30"),
+        ("-2.50E+29", "-2.5E+29"),
+        ("1.5E-30", "1.5E-30"),
+        ("0.3333333333333333333333333333", "0.3333333333333333333333333333"),
+        ("-0", "0"),
+        ("-0.00", "0"),
+        ("0E+27", "0"),
+    ],
+)
+def test_result_text_matches_the_phone_apps(value, expected):
+    assert result_text(Decimal(value)) == expected
+
+
+@pytest.mark.parametrize(
+    ("tokens", "expected"),
+    [
+        (["0.07", "*", "100"], "7"),
+        (["0", "*", "-5"], "0"),
+        (["-0.5", "*", "0"], "0"),
+        (["1.50", "+", "2"], "3.5"),
+    ],
+)
+def test_evaluated_results_drop_trailing_zeros_and_negative_zero(tokens, expected):
+    assert result_text(evaluate(tokens)) == expected

@@ -395,3 +395,25 @@ def test_failed_history_write_is_shown(monkeypatch, tmp_path):
         app.processEvents()
 
     assert window.statusBar().currentMessage() == "Saving history failed: disk full"
+
+
+def test_algebraic_window_drops_trailing_zeros_and_negative_zero(
+    monkeypatch, tmp_path
+):
+    _app()
+    monkeypatch.setattr(root_window, "HISTORY_FILE", tmp_path / "history.json")
+    window = root_window.RootWindow(History(), settings=Settings())
+    for tokens, expected in (
+        (("0", ".", "0", "7", "*", "1", "0", "0"), "7"),
+        (("0", "*", "5", "±"), "0"),
+    ):
+        window._on_clear()
+        for token in tokens:
+            if token == "±":
+                window._on_toggle_sign()
+            else:
+                window._on_token(token)
+        window._on_evaluate()
+        assert window._display._expression_label.text() == expected
+        assert window._history.entries[-1].result == expected
+    window.close()

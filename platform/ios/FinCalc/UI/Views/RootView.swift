@@ -13,21 +13,29 @@ struct RootView: View {
     // Unfinished input survives the system ending the app in the background.
     @SceneStorage("input.tokens") private var savedTokens = ""
     @SceneStorage("input.resultPending") private var savedResultPending = false
+    // The RPN stack is saved the same way; values are joined by one space.
+    @SceneStorage("rpn.levels") private var savedRPNLevels = ""
+    @SceneStorage("rpn.entry") private var savedRPNEntry = ""
+    @SceneStorage("rpn.liftEnabled") private var savedRPNLiftEnabled = true
+    @SceneStorage("rpn.keys") private var savedRPNKeys = ""
     @Environment(\.openURL) private var openURL
     @FocusState private var hasKeyboardFocus: Bool
 
     var body: some View {
         let colors = ThemeColors.colors(for: session.settings.theme)
+        let inputMode = session.settings.inputMode
         NavigationStack {
             GeometryReader { proxy in
                 let tape = TapeView(
                     entries: session.history.entries,
+                    inputMode: inputMode,
                     colors: colors,
                     formatResult: session.formatResult,
                     onSelect: session.insertResult,
                 )
                 let display = DisplayView(
                     expression: session.displayText,
+                    yRegister: session.isRPN ? session.rpnYText : nil,
                     status: session.statusText,
                     colors: colors,
                 )
@@ -37,15 +45,23 @@ struct RootView: View {
                         tape.frame(width: (proxy.size.width - 10) / 2.3)
                         VStack(spacing: 10) {
                             display
-                            KeypadView(colors: colors, onKey: press)
+                            KeypadView(
+                                inputMode: inputMode,
+                                colors: colors,
+                                onKey: press,
+                            )
                         }
                     }
                 } else {
                     VStack(spacing: 10) {
                         tape
                         display
-                        KeypadView(colors: colors, onKey: press)
-                            .frame(height: proxy.size.height * 0.5)
+                        KeypadView(
+                            inputMode: inputMode,
+                            colors: colors,
+                            onKey: press,
+                        )
+                        .frame(height: proxy.size.height * 0.5)
                     }
                 }
             }
@@ -114,6 +130,23 @@ struct RootView: View {
         .onChange(of: session.hasPendingResult) { _, pending in
             savedResultPending = pending
         }
+        .onChange(of: session.rpnLevels) { _, levels in
+            savedRPNLevels = levels.joined(separator: " ")
+        }
+        .onChange(of: session.rpnEntry) { _, entry in
+            savedRPNEntry = entry
+        }
+        .onChange(of: session.rpnLiftEnabled) { _, liftEnabled in
+            savedRPNLiftEnabled = liftEnabled
+        }
+        .onChange(of: session.rpnKeys) { _, keys in
+            savedRPNKeys = keys.joined(separator: " ")
+        }
+        // A mode change empties both inputs; rewrite every saved value so
+        // none is left over from the other mode.
+        .onChange(of: session.settings.inputMode) {
+            store(session.savedInput)
+        }
     }
 
     @ToolbarContentBuilder
@@ -165,12 +198,27 @@ struct RootView: View {
         }
     }
 
+    /// Restore the active mode's saved input, then rewrite all saved values
+    /// from the session so stale values of the other mode are cleared.
     private func restoreSavedInput() {
-        guard session.inputTokens.isEmpty, !savedTokens.isEmpty else { return }
-        session.restoreInput(
-            tokens: savedTokens.split(separator: " ").map(String.init),
+        let saved = SavedInput(
+            tokens: savedTokens,
             resultPending: savedResultPending,
+            rpnLevels: savedRPNLevels,
+            rpnEntry: savedRPNEntry,
+            rpnLiftEnabled: savedRPNLiftEnabled,
+            rpnKeys: savedRPNKeys,
         )
+        store(session.restoreSavedInput(saved))
+    }
+
+    private func store(_ input: SavedInput) {
+        savedTokens = input.tokens
+        savedResultPending = input.resultPending
+        savedRPNLevels = input.rpnLevels
+        savedRPNEntry = input.rpnEntry
+        savedRPNLiftEnabled = input.rpnLiftEnabled
+        savedRPNKeys = input.rpnKeys
     }
 
     private func press(_ key: KeypadKey) {
@@ -180,6 +228,9 @@ struct RootView: View {
         case .clear: session.clear()
         case .backspace: session.backspace()
         case .toggleSign: session.toggleSign()
+        case .enter: session.enter()
+        case .swap: session.swap()
+        case .drop: session.drop()
         }
     }
 
@@ -193,6 +244,10 @@ struct RootView: View {
             session.backspace()
         default:
             let character = keyPress.characters
+            // The RPN keypad has no parentheses.
+            if session.isRPN, character == "(" || character == ")" {
+                return .ignored
+            }
             if character.lowercased() == "l" {
                 session.addSymbol("log")
             } else if "0123456789.+-*/^()".contains(character),

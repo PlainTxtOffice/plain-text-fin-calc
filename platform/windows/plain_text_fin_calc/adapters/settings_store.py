@@ -13,8 +13,10 @@ from typing import TYPE_CHECKING
 from zoneinfo import available_timezones
 
 from plain_text_fin_calc.config.settings import (
+    DEFAULT_INPUT_MODE,
     DEFAULT_THEME,
     THEMES,
+    InputMode,
     Settings,
     Theme,
 )
@@ -114,6 +116,16 @@ def _read_theme(raw: object) -> Theme:
     return DEFAULT_THEME
 
 
+def _read_input_mode(raw: object) -> InputMode:
+    """Return "rpn" only for that exact saved string.
+
+    A missing key, null, another type, or any other string gives the
+    default mode, so settings files saved before the input mode existed load
+    as algebraic.
+    """
+    return "rpn" if raw == "rpn" else DEFAULT_INPUT_MODE
+
+
 def _read_text_tape(raw: object) -> TextTapeFormat:
     """Use each valid saved switch independently, including explicit false."""
     defaults = TextTapeFormat()
@@ -181,6 +193,7 @@ def load_settings(path: Path) -> Settings:
         theme=_read_theme(raw.get("theme")),
         max_history_entries=_read_history_cap(raw),
         text_tape=_read_text_tape(raw.get("text_tape")),
+        input_mode=_read_input_mode(raw.get("input_mode")),
     )
 
 

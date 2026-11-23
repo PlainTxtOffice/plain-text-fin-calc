@@ -73,3 +73,78 @@ def test_keypad_buttons_follow_live_palette_change() -> None:
         get_theme("light").button
     )
     apply_theme(app, "dark")  # restore for other tests
+
+
+def _buttons(keypad: KeypadView) -> dict[str, QPushButton]:
+    return {button.text(): button for button in keypad.findChildren(QPushButton)}
+
+
+def test_rpn_mode_relabels_three_keys_in_place() -> None:
+    """RPN mode shows swap, DROP and ENTER where ( ) and = are."""
+    _app()
+    keypad = KeypadView()
+    before = keypad.findChildren(QPushButton)
+    algebraic_labels = set(_buttons(keypad))
+    assert {"(", ")", "="} <= algebraic_labels
+
+    keypad.set_input_mode("rpn")
+
+    buttons = _buttons(keypad)
+    assert set(buttons) == (algebraic_labels - {"(", ")", "="}) | {
+        "x\u2194y", "DROP", "ENTER",
+    }
+    assert buttons["x\u2194y"].accessibleName() == "Swap X and Y"
+    assert buttons["DROP"].accessibleName() == "Drop"
+    assert buttons["ENTER"].accessibleName() == "Enter"
+    assert keypad.findChildren(QPushButton) == before
+    assert {b.focusPolicy() for b in before} == {Qt.FocusPolicy.NoFocus}
+    assert buttons["ENTER"].font().pixelSize() < buttons["7"].font().pixelSize()
+
+    keypad.set_input_mode("algebraic")
+
+    buttons = _buttons(keypad)
+    assert set(buttons) == algebraic_labels
+    assert [buttons[label].accessibleName() for label in "()="] == ["", "", ""]
+    assert buttons["="].font().pixelSize() == buttons["7"].font().pixelSize()
+
+
+def _record(keypad: KeypadView) -> list[str]:
+    events: list[str] = []
+    keypad.token_pressed.connect(events.append)
+    keypad.evaluate_pressed.connect(lambda: events.append("<evaluate>"))
+    keypad.swap_pressed.connect(lambda: events.append("<swap>"))
+    keypad.drop_pressed.connect(lambda: events.append("<drop>"))
+    return events
+
+
+def test_rpn_buttons_emit_swap_drop_and_evaluate() -> None:
+    """The relabelled keys emit their own signals; the tall key still evaluates."""
+    _app()
+    keypad = KeypadView()
+    events = _record(keypad)
+
+    for label in ("(", ")", "="):
+        _buttons(keypad)[label].click()
+    keypad.set_input_mode("rpn")
+    for label in ("x\u2194y", "DROP", "ENTER", "log", "7"):
+        _buttons(keypad)[label].click()
+
+    assert events == [
+        "(", ")", "<evaluate>", "<swap>", "<drop>", "<evaluate>", "log", "7",
+    ]
+
+
+def test_s_and_d_keys_swap_and_drop_only_in_rpn_mode() -> None:
+    """S and D are RPN shortcuts and stay unbound in algebraic mode."""
+    _app()
+    keypad = KeypadView()
+    events = _record(keypad)
+
+    for key in ("s", "S", "d", "D", "l"):
+        keypad.map_key_press(key)
+    assert events == ["log"]
+
+    keypad.set_input_mode("rpn")
+    for key in ("s", "S", "d", "D", "l", "(", "x"):
+        keypad.map_key_press(key)
+    assert events == ["log", "<swap>", "<swap>", "<drop>", "<drop>", "log", "("]

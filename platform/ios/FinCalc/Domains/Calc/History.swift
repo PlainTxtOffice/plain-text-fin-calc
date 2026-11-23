@@ -8,6 +8,9 @@ struct HistoryEntry: Equatable, Sendable {
     var result: String
     /// When the calculation was performed.
     var timestamp: Date
+    /// The RPN keystrokes that produced the entry (e.g. "12 ENTER 3 +");
+    /// nil for an entry made in algebraic mode.
+    var rpnInput: String? = nil
 }
 
 /// In-memory ordered list of calculation history entries.

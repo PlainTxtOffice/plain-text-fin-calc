@@ -45,6 +45,82 @@ struct HistoryStoreTests {
         #expect(text.contains("\"1 / 4\""))
     }
 
+    @Test func rpnInputRoundTrips() throws {
+        let history = History(entries: [
+            HistoryEntry(
+                expression: "1 / 4",
+                result: "0.25",
+                timestamp: Date(timeIntervalSince1970: 1_700_000_000.5),
+            ),
+            HistoryEntry(
+                expression: "3 + 4",
+                result: "7",
+                timestamp: Date(timeIntervalSince1970: 1_700_000_005),
+                rpnInput: "3 ENTER 4 +",
+            ),
+        ])
+        let url = folder.file("history.json")
+        try HistoryStore.writeHistory(history, to: url)
+        let loaded = HistoryStore.loadHistory(from: url)
+        #expect(loaded == history)
+        #expect(loaded.entries.map(\.rpnInput) == [nil, "3 ENTER 4 +"])
+        // Only the RPN entry carries the key.
+        let text = try String(contentsOf: url, encoding: .utf8)
+        #expect(text.components(separatedBy: "rpn_input").count == 2)
+        #expect(text.contains("\"rpn_input\" : \"3 ENTER 4 +\""))
+    }
+
+    @Test func algebraicEntryIsWrittenWithoutRPNInput() throws {
+        let history = History(entries: [
+            HistoryEntry(
+                expression: "2 + 2",
+                result: "4",
+                timestamp: Date(timeIntervalSince1970: 0),
+            ),
+            // An empty keystroke text counts as algebraic.
+            HistoryEntry(
+                expression: "2 + 3",
+                result: "5",
+                timestamp: Date(timeIntervalSince1970: 1),
+                rpnInput: "",
+            ),
+        ])
+        let url = folder.file("history.json")
+        try HistoryStore.writeHistory(history, to: url)
+        let text = try String(contentsOf: url, encoding: .utf8)
+        #expect(!text.contains("rpn_input"))
+        #expect(
+            HistoryStore.loadHistory(from: url).entries.map(\.rpnInput)
+                == [nil, nil],
+        )
+    }
+
+    @Test func fileWithoutRPNInputLoadsUnchanged() throws {
+        try folder.write("""
+            [{"expression": "2 + 2", "result": "4",
+              "timestamp": "2026-10-22T21:33:00Z"},
+             {"expression": "1 / 4", "result": "0.25",
+              "timestamp": "2026-10-22T21:34:00.500Z"}]
+            """, to: "history.json")
+        let history = HistoryStore.loadHistory(from: folder.file("history.json"))
+        #expect(history.entries.map(\.expression) == ["2 + 2", "1 / 4"])
+        #expect(history.entries.map(\.result) == ["4", "0.25"])
+        #expect(history.entries.map(\.rpnInput) == [nil, nil])
+    }
+
+    @Test(arguments: ["5", "\"\"", "null", "true", "[\"3\"]"])
+    func invalidRPNInputLoadsAsAlgebraicEntry(value: String) throws {
+        try folder.write("""
+            [{"expression": "3 + 4", "result": "7", "rpn_input": \(value),
+              "timestamp": "2026-10-22T21:33:00Z"},
+             {"expression": "7 * 5", "result": "35", "rpn_input": "5 *",
+              "timestamp": "2026-10-22T21:34:00Z"}]
+            """, to: "history.json")
+        let history = HistoryStore.loadHistory(from: folder.file("history.json"))
+        #expect(history.entries.map(\.expression) == ["3 + 4", "7 * 5"])
+        #expect(history.entries.map(\.rpnInput) == [nil, "5 *"])
+    }
+
     @Test func readsWindowsTimestamps() throws {
         try folder.write("""
             [{"expression": "2 + 2", "result": "4",
@@ -85,6 +161,49 @@ struct SettingsStoreTests {
         #expect(SettingsStore.loadSettings(from: url) == settings)
         let text = try String(contentsOf: url, encoding: .utf8)
         #expect(text.contains("\"max_history_entries\" : null"))
+    }
+
+    @Test func inputModeRoundTrips() throws {
+        let settings = Settings(inputMode: .rpn)
+        let url = folder.file("settings.json")
+        try SettingsStore.writeSettings(settings, to: url)
+        #expect(SettingsStore.loadSettings(from: url) == settings)
+        #expect(SettingsStore.loadSettings(from: url).inputMode == .rpn)
+        let text = try String(contentsOf: url, encoding: .utf8)
+        #expect(text.contains("\"input_mode\" : \"rpn\""))
+    }
+
+    @Test func inputModeIsAlwaysWritten() throws {
+        let url = folder.file("settings.json")
+        try SettingsStore.writeSettings(Settings(), to: url)
+        let text = try String(contentsOf: url, encoding: .utf8)
+        #expect(text.contains("\"input_mode\" : \"algebraic\""))
+    }
+
+    @Test func defaultInputModeIsAlgebraic() {
+        #expect(Settings().inputMode == .algebraic)
+    }
+
+    @Test(arguments: [
+        #"{"decimal_places": 3, "theme": "light"}"#,
+        #"{"decimal_places": 3, "theme": "light", "input_mode": 7}"#,
+        #"{"decimal_places": 3, "theme": "light", "input_mode": "other"}"#,
+        #"{"decimal_places": 3, "theme": "light", "input_mode": null}"#,
+        #"{"decimal_places": 3, "theme": "light", "input_mode": "RPN"}"#,
+        #"{"decimal_places": 3, "theme": "light", "input_mode": "algebraic"}"#,
+    ])
+    func missingOrInvalidInputModeIsAlgebraic(text: String) throws {
+        let settings = try load(text)
+        #expect(settings.inputMode == .algebraic)
+        // The other fields of the file still load.
+        #expect(settings.decimalPlaces == 3)
+        #expect(settings.theme == .light)
+    }
+
+    @Test func storedRPNInputModeLoads() throws {
+        let settings = try load(#"{"theme": "light", "input_mode": "rpn"}"#)
+        #expect(settings.inputMode == .rpn)
+        #expect(settings.theme == .light)
     }
 
     @Test func missingFileUsesDefaults() {

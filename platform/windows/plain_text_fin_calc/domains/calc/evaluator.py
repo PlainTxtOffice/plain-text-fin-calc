@@ -16,12 +16,34 @@ which folds a negation sign into the number token itself.
 from __future__ import annotations
 
 import logging
+from decimal import Context, InvalidOperation
 from decimal import Decimal as D
-from decimal import InvalidOperation
 
 from plain_text_fin_calc.domains.calc.errors import EvaluationError
 
 logger = logging.getLogger(__name__)
+
+# Largest decimal exponent written as plain digits; matches the 28-digit
+# working precision and the Android and iOS apps.
+PLAIN_EXPONENT_LIMIT = 28
+
+
+def result_text(value: D) -> str:
+    """Return the stored text of a calculation result.
+
+    - Trailing zeros are dropped, so 0.07 * 100 gives "7", as on Android
+      and iOS.
+    - Zero is always "0", never "-0".
+    - Values whose decimal exponent is within 28 of zero are plain digits
+      (1000, not 1E+3); larger or smaller values keep scientific notation.
+    """
+    if value.is_zero():
+        return "0"
+    # A context as wide as the value keeps normalize() from rounding.
+    stripped = value.normalize(Context(prec=len(value.as_tuple().digits)))
+    if -PLAIN_EXPONENT_LIMIT <= stripped.adjusted() <= PLAIN_EXPONENT_LIMIT:
+        return format(stripped, "f")
+    return str(stripped)
 
 
 def evaluate(tokens: list[str]) -> D:

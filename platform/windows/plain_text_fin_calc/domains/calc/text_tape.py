@@ -54,7 +54,11 @@ def format_text_tape(
     entries: Iterable[HistoryEntry],
     options: TextTapeFormat,
 ) -> str:
-    """Render entries in tape order, preserving their full saved precision."""
+    """Render entries in tape order, preserving their full saved precision.
+
+    An RPN entry is followed by one ``RPN input: <keys>`` line without a time
+    prefix; algebraic entries have no such line.
+    """
     lines: list[str] = []
     previous_date = None
     zone = None if options.time_zone == "local" else ZoneInfo(options.time_zone)
@@ -70,5 +74,7 @@ def format_text_tape(
             if options.entry_times:
                 line = f"{options.format_time(stamp)}  {line}"
         lines.append(line)
+        if entry.rpn_input:
+            lines.append(f"RPN input: {entry.rpn_input}")
     lines.append("")
     return "\n".join(lines)

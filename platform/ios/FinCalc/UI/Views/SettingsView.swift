@@ -50,6 +50,22 @@ struct SettingsView: View {
                             + "Display rounding does not change saved results or later calculations.",
                     )
                 }
+                Section {
+                    Picker("Input mode", selection: $draft.inputMode) {
+                        Text("Algebraic").tag(InputMode.algebraic)
+                        Text("RPN (reverse Polish notation)")
+                            .tag(InputMode.rpn)
+                    }
+                } header: {
+                    Text("Input")
+                } footer: {
+                    Text(
+                        "In RPN mode, numbers go onto a stack with ENTER and "
+                            + "each operator uses the last two numbers. "
+                            + "Changing the input mode clears the number "
+                            + "being entered and the stack. History is kept.",
+                    )
+                }
                 Section("Appearance") {
                     Picker("Theme", selection: $draft.theme) {
                         ForEach(Theme.allCases, id: \.self) { theme in

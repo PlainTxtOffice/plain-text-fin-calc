@@ -12,6 +12,10 @@ Theme = Literal["dark", "light"]
 THEMES: tuple[Theme, ...] = ("dark", "light")
 DEFAULT_THEME: Theme = "dark"
 
+InputMode = Literal["algebraic", "rpn"]
+INPUT_MODES: tuple[InputMode, ...] = ("algebraic", "rpn")
+DEFAULT_INPUT_MODE: InputMode = "algebraic"
+
 
 @dataclass
 class Settings:
@@ -27,6 +31,9 @@ class Settings:
         Maximum retained history entries; None means unlimited.
     text_tape : TextTapeFormat
         Date and time layout for plain text exports.
+    input_mode : InputMode
+        How calculations are entered: "algebraic" (the default) or "rpn"
+        (reverse Polish notation).
 
     """
 
@@ -34,3 +41,4 @@ class Settings:
     theme: Theme = DEFAULT_THEME
     max_history_entries: int | None = DEFAULT_HISTORY_CAP
     text_tape: TextTapeFormat = field(default_factory=TextTapeFormat)
+    input_mode: InputMode = DEFAULT_INPUT_MODE

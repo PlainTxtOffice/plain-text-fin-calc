@@ -2,7 +2,11 @@
 
 from dataclasses import replace
 
-from plain_text_fin_calc.config.settings import THEMES, Settings
+from plain_text_fin_calc.config.settings import (
+    INPUT_MODES,
+    THEMES,
+    Settings,
+)
 from plain_text_fin_calc.domains.calc.formatting import MAX_DECIMAL_PLACES
 from plain_text_fin_calc.domains.calc.history import (
     MAX_HISTORY_CAP,
@@ -37,6 +41,12 @@ def parse_setting(settings: Settings, name: str, value: str) -> Settings:
             else _bounded_integer(value, MIN_HISTORY_CAP, MAX_HISTORY_CAP)
         )
         return replace(settings, max_history_entries=cap)
+    if name == "input_mode":
+        for mode in INPUT_MODES:
+            if value == mode:
+                return replace(settings, input_mode=mode)
+        msg = f"Input mode must be one of: {', '.join(INPUT_MODES)}."
+        raise ValueError(msg)
     if name == "theme":
         for theme in THEMES:
             if value == theme:

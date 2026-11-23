@@ -1,10 +1,10 @@
 ---
-last_updated: 2026-11-22
-version: 6.2.1
+last_updated: 2026-11-23
+version: 6.5.0
 product_versions:
   windows: "0.1.0"
   ios: "1.0.0"
-  android: "0.4.0"
+  android: "0.5.0"
 generated_from: "dev-docs/specs/USER_MANUAL_SPEC.instructions.md"
 ---
 
@@ -19,6 +19,19 @@ error. Every successful calculation is saved to a scrolling list called the
 tape, which you can reuse, clear, and export as a CSV file. The Windows
 graphical app can also save the tape as plain text.
 
+Plain Text Fin Calc has an optional RPN (reverse Polish notation) input
+mode, in which numbers go onto a stack and each operator uses the last two
+numbers. RPN mode is in Android 0.5.0 and later. It is in development on iOS,
+where it is not in 1.0.0 and arrives in a later version, and the Windows app,
+itself in development, has it in the graphical window, the terminal
+interface, and the command line. See
+[Calculate in RPN Mode](#calculate-in-rpn-mode).
+
+<!-- Verified from: platform/ios/FinCalc/Config/Settings.swift [InputMode] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/config/Settings.kt [Settings.inputMode] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/config/settings.py [Settings.input_mode, INPUT_MODES] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [RpnStack, run_line] -->
+
 Plain Text Fin Calc is for anyone who wants predictable decimal results and a
 running record of their calculations, such as when checking figures or totals.
 
@@ -27,15 +40,15 @@ running record of their calculations, such as when checking figures or totals.
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow] -->
 
 Plain Text Fin Calc runs on three platforms. Each keeps its own saved history
-and settings; nothing is synchronized between them. The Android app is in
-Google Play review; the iOS app is in App Store review, and the Windows app is
-in development. Plain Text Fin Calc is open source under the MIT License.
+and settings; nothing is synchronized between them. The Android app is
+available on Google Play; the iOS app is in App Store review, and the Windows
+app is in development. Plain Text Fin Calc is open source under the MIT License.
 
 | Platform | Interfaces | Version | Status |
 | --- | --- | --- | --- |
 | Windows | Graphical window, terminal interface, and command line | 0.1.0 | In development |
 | iOS (iPhone and iPad) | Touch app | 1.0.0 | In App Store review |
-| Android | Touch app | 0.4.0 | In Google Play review |
+| Android | Touch app | 0.5.0 | Available on Google Play |
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/app.py [select_interface] -->
 <!-- Verified from: platform/windows/pyproject.toml [project.version] -->
@@ -53,7 +66,7 @@ in development. Plain Text Fin Calc is open source under the MIT License.
 | --- | --- |
 | Windows (in development) | Python 3.14 or newer. |
 | iOS | iOS or iPadOS 26.4 or newer on an iPhone or iPad. |
-| Android (in Google Play review) | Android 8.0 (API level 26) or newer. |
+| Android | Android 8.0 (API level 26) or newer. |
 
 <!-- Verified from: platform/windows/pyproject.toml [requires-python] -->
 <!-- Verified from: platform/ios/FinCalc.xcodeproj/project.pbxproj [IPHONEOS_DEPLOYMENT_TARGET, TARGETED_DEVICE_FAMILY] -->
@@ -85,8 +98,9 @@ started without options and stores its data in a different folder; see
 
 #### Install on iOS and Android
 
-The Android app is in Google Play review and is not yet available to
-download. It requires Android 8.0 or later and requests no network or storage
+Install the Android app from
+[Google Play](https://play.google.com/store/apps/details?id=com.plaintxtoffice.fincalc).
+It requires Android 8.0 or later and requests no network or storage
 permissions.
 
 The iOS app is in App Store review and is not yet available to download.
@@ -166,11 +180,18 @@ What to expect on startup:
   such as `calculate` print their output and return to the system shell. See
   [Use the Windows Command Line](#use-the-windows-command-line).
 
+When **Input mode** is set to RPN (in development), the terminal interface
+instead shows
+`Enter numbers and operators separated by spaces and press Enter.` and the
+hint `Example: 3 4 + or 100 log`, and the persistent prompt is
+`fin-calc rpn>`. See [Calculate in RPN Mode](#calculate-in-rpn-mode).
+
 If the saved data folder cannot be used, Plain Text Fin Calc prints
 `Unable to start calculator:` followed by the reason.
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow.__init__] -->
-<!-- Verified from: platform/windows/plain_text_fin_calc/ui/tui/app.py [CalculatorApp.compose] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/tui/app.py [CalculatorApp.compose, _RPN_IDLE_TEXT, _RPN_PLACEHOLDER] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/repl.py [_RPN_PROMPT] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/app.py [select_interface] -->
 
 A packaged Windows program opens the graphical window when started without
@@ -249,8 +270,13 @@ The iOS and Android keys, display, and tape show **×** for multiply, **÷**
 for divide, and **−** for subtract and for negative numbers.
 Saved history and CSV exports keep `*`, `/`, and `-`.
 
-<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/keypad.py [BUTTON_LAYOUT] -->
-<!-- Verified from: platform/ios/FinCalc/UI/Views/KeypadView.swift [KeypadView.rows, KeyLabels] -->
+In RPN mode, three keys change: **x↔y** replaces **(**,
+**DROP** replaces **)**, and **ENTER** replaces **=**. A **Y:** line appears
+above the display. See [Calculate in RPN Mode](#calculate-in-rpn-mode).
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/keypad.py [BUTTON_LAYOUT, RPN_KEYS] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/display.py [DisplayView.set_rpn_mode, DisplayView.set_y] -->
+<!-- Verified from: platform/ios/FinCalc/UI/Views/KeypadView.swift [KeypadView.keyRows, KeypadView.tallKey, KeypadKey.label, KeyLabels] -->
 <!-- Verified from: platform/ios/FinCalc/UI/Views/TapeView.swift [TapeView.row] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/ui/KeypadView.kt [KeyLabels, KeypadView] -->
 
@@ -440,7 +466,9 @@ saved tape.
 
 Deleting removes one digit of a number, or the whole last operator,
 parenthesis, or `log`. In the Windows terminal interface, edit the entry field
-as usual, or press **Esc** to clear it.
+as usual, or press **Esc** to clear it. In RPN mode, these keys act on the
+number being typed and the stack; see
+[Calculate in RPN Mode](#calculate-in-rpn-mode).
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow.keyPressEvent] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/expression.py [ExpressionBuilder.backspace, ExpressionBuilder.toggle_sign] -->
@@ -452,6 +480,8 @@ as usual, or press **Esc** to clear it.
 
 After you evaluate, the result stays in the display as the start of the next
 expression. This applies to the Windows graphical window, iOS, and Android.
+In RPN mode, the result stays on the stack instead; see
+[Calculate in RPN Mode](#calculate-in-rpn-mode).
 
 - Press an operator to continue from the result, such as `+ 5`.
 - Press a digit, `.`, `(`, or **log** to start a new expression instead.
@@ -477,13 +507,240 @@ You can also touch and hold a line, then choose **Use Result**, or choose
 **Copy Result** to copy the full-precision result. The Windows terminal
 interface and command line cannot reuse results.
 
+In RPN mode, a reused result goes onto the stack; see
+[Calculate in RPN Mode](#calculate-in-rpn-mode).
+
 <!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/expression.py [ExpressionBuilder.insert_result] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._on_result_clicked] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/tape.py [TapeView._on_item_clicked] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/tui/app.py [CalculatorApp.compose] -->
 <!-- Verified from: platform/ios/FinCalc/Domains/Calc/ExpressionBuilder.swift [insertResult] -->
 <!-- Verified from: platform/ios/FinCalc/UI/Views/TapeView.swift [TapeView.row] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/ExpressionBuilder.kt [insertResult] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/ui/TapeView.kt [Rows.onBindViewHolder] -->
+
+### Calculate in RPN Mode
+
+RPN (reverse Polish notation) is an optional way to enter calculations.
+Instead of entering an expression and **=**, you put numbers onto a stack,
+and each operator uses the last two numbers. RPN mode is in Android 0.5.0
+and later. It is in development on iOS, where it is not in 1.0.0 and arrives
+in a later version, and the Windows app, itself in development, has it in
+every interface.
+
+To turn it on, open the settings, set **Input mode** to
+**RPN (reverse Polish notation)**, and save with **Save** on iOS and Android
+or **OK** on Windows; see [Change Settings](#change-settings). Algebraic
+entry, described in
+[Enter and Evaluate an Expression](#enter-and-evaluate-an-expression), stays
+the default.
+
+The keypad description below applies to the iOS and Android apps and the
+Windows graphical window. In the Windows terminal interface and on the
+command line you type RPN lines instead; see
+[Type RPN Lines on Windows](#type-rpn-lines-on-windows).
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/dialogs/settings_dialog.py [SettingsDialog] -->
+<!-- Verified from: platform/ios/FinCalc/UI/Views/SettingsView.swift [SettingsView.body] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/ui/SettingsDialog.kt [showSettings] -->
+<!-- Verified from: platform/android/app/src/main/res/values/strings.xml [settings_input_mode, settings_input_mode_rpn] -->
+
+The stack holds up to four numbers. The last number is called X and the one
+before it Y. In RPN mode, the keypad and display work as follows:
+
+| Key or line | What it does in RPN mode |
+| --- | --- |
+| **0**–**9**, **.** | Enter a number. Starting a number with **.** enters `0.`. |
+| **ENTER** (in place of **=**) | Finishes the number being typed and puts a copy of it on the stack. The next number you type replaces the copy. |
+| **x↔y** (in place of **(**) | Swaps X and Y. |
+| **DROP** (in place of **)**) | Removes X from the stack. |
+| **+**, **-**, **\***, **/**, **^** | Calculates Y, the operator, then X, such as Y − X or Y ÷ X, and replaces both numbers with the result. |
+| **log** | Replaces X with its base-10 logarithm. |
+| **±** | Changes the sign of the number being typed. When no number is being typed, changes the sign of X. |
+| **C** | Clears the number being typed. When no number is being typed, clears the whole stack. History is not affected. |
+| **⌫** (iOS, Android) or **←** (Windows) | Deletes the last character of the number being typed. |
+| Display | Shows X: the number being typed, or the last number on the stack. When the stack is empty, shows `0` on iOS and Android and nothing on Windows. |
+| **Y:** line above the display | Shows `Y:` and the value of Y, or `Y:` alone when there is none. |
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/keypad.py [RPN_KEYS, KeypadView.set_input_mode] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._press_rpn, RootWindow._refresh_display] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [RpnStack.press] -->
+
+<!-- Verified from: platform/ios/FinCalc/UI/Views/KeypadView.swift [KeypadKey.label, KeypadView.rpnTopRow, KeypadView.tallKey] -->
+<!-- Verified from: platform/ios/FinCalc/UI/Views/DisplayView.swift [DisplayView.yLine] -->
+<!-- Verified from: platform/ios/FinCalc/Domains/Calc/RpnStack.swift [RpnStack] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/ui/KeypadView.kt [KeypadView] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/ui/CalculatorView.kt [CalculatorView.yRegister] -->
+<!-- Verified from: platform/android/app/src/main/res/values/strings.xml [key_swap, key_drop, key_enter, rpn_y_value, rpn_y_empty] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [RpnStack.press] -->
+
+For example, to add 3 and 4:
+
+1. Click or tap **3**, then **ENTER**. The display shows `3`, and the line
+   above it shows `Y: 3`.
+1. Click or tap **4**. The display shows `4`.
+1. Click or tap **+**. The display shows `7`, and the tape gains `3 + 4`
+   with `= 7`.
+
+The result stays on the stack, so you can keep going: **5** and then **×**
+gives `35` and adds `7 × 5` with `= 35` to the tape. In the Windows graphical
+window the key is **\***, and the tape lines read `3 + 4 = 7` and
+`7 * 5 = 35`.
+
+These rules apply:
+
+- Only X and Y are shown. When the stack already holds four numbers, a new
+  number discards the oldest one. When an operator or **DROP** shortens a
+  full stack, the oldest number is kept and copied into the place that opens
+  up.
+- The **-** key always subtracts. To enter a negative number, type the number
+  and then use **±**.
+- A number can have up to 28 digits and one decimal point.
+- **Decimal places** rounds X and Y on screen, but not a number while you
+  type it. The stack keeps full precision, and results equal those of the
+  same calculation in algebraic entry.
+- Each operator and **log** adds one calculation to the tape, written as the
+  equivalent expression and its result, such as `3 + 4` or `log ( 100 )`. A
+  negative number is written with its minus sign, as in `3 - -5`. **ENTER**,
+  **x↔y**, **DROP**, **±**, **C**, and the delete key add nothing to the
+  tape.
+- The keys of each calculation are saved with it and appear in CSV exports;
+  see [Read the Exported CSV File](#read-the-exported-csv-file). On Windows,
+  they also appear in plain text exports; see
+  [Export a Plain Text Tape on Windows](#export-a-plain-text-tape-on-windows).
+  The tape itself does not show them.
+- Clicking or tapping a line on the tape, or choosing **Use Result** on iOS,
+  puts that result on the stack as X. It replaces a number being typed or the
+  copy made by **ENTER**.
+- Changing **Input mode** clears the number being entered and the stack.
+  History is kept.
+- The stack is not part of your saved history. On iOS and Android, if the
+  system closes the app in the background, the stack and the number being
+  typed return when you reopen it. On Windows, the stack starts empty each
+  time the program starts.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [RpnStack, MAX_LEVELS, MAX_ENTRY_DIGITS] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow.__init__, RootWindow._run_rpn, RootWindow._on_result_clicked, RootWindow._apply_settings] -->
+<!-- Verified from: platform/ios/FinCalc/Domains/Calc/RpnStack.swift [RpnStack, maxLevels, maxEntryDigits] -->
+<!-- Verified from: platform/ios/FinCalc/Application/CalculatorSession.swift [insertResult, applySettings] -->
+<!-- Verified from: platform/ios/FinCalc/UI/Views/RootView.swift [SceneStorage rpn.levels, rpn.entry] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [RpnStack, MAX_LEVELS, MAX_ENTRY_DIGITS] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/application/CalculatorSession.kt [apply, reuse, shownExpression, shownY, updateSettings] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/MainActivity.kt [onSaveInstanceState] -->
+
+A key that cannot be used shows a message under the display and changes
+nothing; a number being typed stays as it is.
+
+| Message | Meaning |
+| --- | --- |
+| `Too few operands` | An operator or **x↔y** needs two numbers on the stack, and **ENTER**, **DROP**, or **log** needs one. A number being typed counts as one. |
+| `Invalid input:` followed by the key | The number already has 28 digits, or it already has a decimal point. In the Windows graphical window, typing **(** or **)** on the keyboard also shows it. |
+
+Calculations that cannot be completed show the same messages as algebraic
+entry, such as `Division by zero`,
+`Log undefined for non-positive values`, and `Result out of range`.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [RpnStack.press, RpnStack._require, RpnStack._add_digit, RpnStack._add_point] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._run_rpn] -->
+<!-- Verified from: platform/ios/FinCalc/Domains/Calc/RpnStack.swift [tooFewOperands, press] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [needing, digit, point] -->
+
+#### Type RPN Lines on Windows
+
+The Windows terminal interface and command line (in development) take RPN as
+a typed line: numbers, operators, and words separated by spaces, such as
+`3 4 +`. The line runs from left to right when you press **Enter**.
+
+| Part of the line | What it does |
+| --- | --- |
+| A number, such as `3`, `0.5`, or `-5` | Puts the number on the stack. A negative number has its minus sign attached. A number can have up to 28 digits; scientific notation, such as `1e3`, is not accepted. |
+| `+`, `-`, `*`, `/`, `^` | Calculates Y, the operator, then X, and replaces both numbers with the result. A `-` on its own always subtracts. |
+| `log` | Replaces X with its base-10 logarithm. |
+| `enter` | Puts a copy of X on the stack, as the **ENTER** key does. Numbers are already separate, so `3 4 +` needs no `enter`. |
+| `swap` | Swaps X and Y. |
+| `drop` | Removes X from the stack. |
+| `chs` | Changes the sign of X. |
+| `clear` | Clears the whole stack. History is not affected. |
+
+The words can be typed in capitals or lowercase. The stack rules, the tape
+lines, and the saved keys are the same as with the keypad, and a line is
+limited to 2,048 characters and 128 parts. Each operator and `log` adds one
+calculation to the tape, so `3 4 + 5 *` adds `3 + 4 = 7` and `7 * 5 = 35`.
+
+A line either runs completely or not at all. If any part cannot be used, the
+error is shown, nothing is saved, and the stack stays as it was before the
+line. The messages are `Too few operands`, `Invalid input:` followed by the
+part that was not understood, such as `Invalid input: 3+4`, and the
+calculation messages of algebraic entry, such as `Division by zero`.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [run_line, RpnStack.number, _WORD_KEYS] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/application/session.py [CalculatorSession.run_rpn_line] -->
+
+In the terminal interface:
+
+1. Set **Input mode** to RPN before you start the terminal interface; it
+   reads the setting when it starts and cannot change it. The result line
+   shows `Enter numbers and operators separated by spaces and press Enter.`
+1. Type a line, such as `3 4 +`, and press **Enter**.
+
+The result line shows the stack on one line, with X last, such as
+`Y: 7  X: 5`. It shows every number on the stack, named T, Z, Y, and X,
+rounded to **Decimal places**, or `Stack is empty.` The tape updates and the
+entry field clears. After an error, the result line shows `Error:` and the
+reason, and your entry stays so you can correct it. **Esc** clears the entry
+field and keeps the stack.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/tui/app.py [CalculatorApp.__init__, CalculatorApp.on_input_submitted, CalculatorApp.action_clear_input, CalculatorApp._idle_text] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/formatting.py [format_stack_lines] -->
+
+At the persistent prompt, type `config input_mode rpn` to switch to RPN and
+`config input_mode algebraic` to switch back. The prompt reads
+`fin-calc rpn>` in RPN mode, and each line prints the stack, one number per
+line with X last:
+
+```text
+fin-calc rpn> 3 4 +
+X: 7
+fin-calc rpn> 5
+Y: 7
+X: 5
+fin-calc rpn> *
+X: 35
+fin-calc rpn> 8 0 /
+Error: Division by zero
+fin-calc rpn> history
+3 + 4 = 7
+7 * 5 = 35
+```
+
+The example assumes empty history and full-precision display. `history`,
+`help`, `config`, `exit`, and `quit` work as in algebraic entry, and `help`
+describes RPN lines. The stack lasts until you leave the prompt or change the
+input mode. See [Use the Persistent Prompt](#use-the-persistent-prompt).
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/repl.py [_read_expressions, _run_calculation, _RPN_HELP] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/settings/values.py [parse_setting] -->
+
+For a single calculation, add `--rpn` to `calculate`. From
+`platform/windows/`:
+
+```powershell
+.venv/Scripts/python.exe -m plain_text_fin_calc.main calculate --rpn "3 4 +"
+```
+
+Plain Text Fin Calc prints `7`, the last number on the stack, rounded to
+**Decimal places**, and saves every calculation in the line. Each command
+starts with an empty stack. `calculate` reads RPN only with `--rpn`, and
+reads an expression without it, whatever **Input mode** is set to. A line
+that leaves the stack empty prints `Error: Stack is empty`. If the line
+starts with a minus sign, put `--` before it:
+
+```powershell
+.venv/Scripts/python.exe -m plain_text_fin_calc.main calculate --rpn -- "-5 3 *"
+```
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/commands.py [calculate] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/application/session.py [CalculatorSession.calculate_rpn] -->
 
 ### Review Saved History
 
@@ -552,28 +809,30 @@ The platforms differ in range and in how full-precision results look:
 
 | Platform | Range of results | How full-precision results look |
 | --- | --- | --- |
-| Windows | Much wider than the mobile apps; for example, `10 ^ 1000000` is `Result out of range`. | Very small results can use scientific notation, such as `1E-7`. Some results keep trailing zeros, such as `2.000000000000000000000000000` for `log(100)`. |
+| Windows | Much wider than the mobile apps; for example, `10 ^ 1000000` is `Result out of range`. | Plain digits with trailing zeros removed, such as `7` for `0.07 * 100` and `2` for `log(100)`. Zero never shows a minus sign. Results beyond 28 digits from the decimal point use scientific notation. |
 | iOS | About 1E-128 to 1E165. | Plain digits. |
 | Android | Powers of ten from -9,999 to 9,999. | Plain digits with trailing zeros removed, such as `1000` for `500 + 500`. Results beyond 28 digits from the decimal point use scientific notation. |
 
 Logarithms and fractional powers are computed differently on each platform,
 so their last digit can differ between platforms.
 
-<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/evaluator.py [evaluate] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/evaluator.py [evaluate, result_text] -->
 <!-- Verified from: platform/ios/FinCalc/Domains/Calc/DecimalMath.swift [exp, log10] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/DecimalMath.kt [checked, ln, exp] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/application/CalculatorSession.kt [calculate] -->
 
 ## Settings and Preferences
 
-All platforms have the same three settings. Changes take effect as soon as
-you save them and are kept between runs.
+All platforms have the same three settings, and **Input mode** (in
+development). The Windows graphical window adds plain text export options.
+Changes take effect as soon as you save them and are kept between runs.
 
 | Setting | Default | Accepted values | How to change it |
 | --- | --- | --- | --- |
 | **Decimal places** | Full precision | **Full precision**, or 0 through 6 | Settings on each platform |
 | **Theme** | Dark | **Dark** or **Light** | Settings on each platform |
 | Maximum history entries | 1,000 | 1 through 10,000, or **Unlimited** | Settings on each platform |
+| **Input mode** (in development) | Algebraic | **Algebraic** or **RPN (reverse Polish notation)** | Settings on each platform |
 | **Plain text export (.txt)** | Local date headings and 24-hour times to the minute | Choose a zone, date order, clock style, seconds, and UTC offsets | Windows graphical Settings |
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/config/settings.py [Settings] -->
@@ -589,19 +848,29 @@ you save them and are kept between runs.
 - **Theme** switches between dark and light colors.
 - Maximum history entries sets how many calculations are kept. Lowering it
   removes the oldest calculations right away.
+- **Input mode** chooses algebraic entry or RPN; see
+  [Calculate in RPN Mode](#calculate-in-rpn-mode). Changing it clears the
+  number being entered and the stack. History is kept. It is in Android
+  0.5.0 and later; it is not in iOS 1.0.0, and the Windows app is in
+  development.
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/formatting.py [format_result] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/dialogs/settings_dialog.py [SettingsDialog, INPUT_MODE_EXPLANATION] -->
 <!-- Verified from: platform/ios/FinCalc/Domains/Calc/Formatting.swift [formatResult] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/Formatting.kt [formatResult] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._apply_settings] -->
 <!-- Verified from: platform/ios/FinCalc/Application/CalculatorSession.swift [applySettings] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/application/CalculatorSession.kt [updateSettings] -->
+<!-- Verified from: platform/ios/FinCalc/UI/Views/SettingsView.swift [SettingsView.body] -->
+<!-- Verified from: platform/android/app/src/main/res/values/strings.xml [settings_input_mode, settings_input_mode_algebraic, settings_input_mode_rpn, settings_input_mode_explanation] -->
 
 ### Change Settings
 
 1. Open the settings: **Edit** > **Settings...** in the Windows graphical
    window, **Settings** on iOS, or **⋮** > **Settings** on Android.
 1. Choose **Decimal places** and **Theme**.
+1. Choose **Input mode** (in development): **Algebraic** or
+   **RPN (reverse Polish notation)**. On iOS, it is under **Input**.
 1. Turn on **Unlimited**, or turn it off and enter the maximum number of
    history entries.
 1. On Windows, use **Plain text export (.txt)** to choose a time zone and format
@@ -631,6 +900,8 @@ read them each time they start. The `fin-calc>` prompt can also change them
 with `config`; see [Use the Persistent Prompt](#use-the-persistent-prompt).
 The terminal interface cannot edit settings. You can also edit the settings
 file by hand; see [Edit the Windows Data Files](#edit-the-windows-data-files).
+The one-shot `calculate` command does not follow **Input mode**; it reads RPN
+only with `--rpn`.
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/dialogs/settings_dialog.py [SettingsDialog] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._on_open_settings, RootWindow._apply_settings] -->
@@ -690,26 +961,52 @@ first.
 | `timestamp` | When the calculation was made, as an ISO 8601 date and time in UTC. |
 | `expression` | The expression as shown on the tape. |
 | `result` | The full-precision result. |
+| `rpn_input` | In Android 0.5.0 and later; not in iOS 1.0.0, and the Windows app is in development. The keys of a calculation made in RPN mode, such as `3 ENTER 4 +`. Empty for calculations made in algebraic entry. |
 
 A field that contains a comma, quotation mark, or line break is enclosed in
 quotation marks. Example from Windows:
 
 ```csv
-timestamp,expression,result
-2026-10-25T14:03:07.512345+00:00,0.1 + 0.2,0.3
-2026-10-25T14:03:20.104211+00:00,1 / 3,0.3333333333333333333333333333
+timestamp,expression,result,rpn_input
+2026-10-25T14:03:07.512345+00:00,0.1 + 0.2,0.3,
+2026-10-25T14:03:20.104211+00:00,1 / 3,0.3333333333333333333333333333,
 ```
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/adapters/history_export.py [write_history_csv] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._on_evaluate] -->
 
+Example from Android, with one calculation made in algebraic entry and one in
+RPN mode:
+
+```csv
+timestamp,expression,result,rpn_input
+2026-11-23T12:00:00.250Z,1 / 3,0.3333333333333333333333333333,
+2026-11-23T12:00:05.125Z,3 + 4,7,3 ENTER 4 +
+```
+
+In `rpn_input`, the keys are separated by spaces. Each number appears whole,
+with its sign, rather than digit by digit. `ENTER`, `SWAP` (**x↔y**), `DROP`,
+and `LOG` stand for those keys, `CHS` for **±** used to change the sign of X,
+and `+`, `-`, `*`, `/`, and `^` for the operators. A result reused from the
+tape appears as its number. **C**, **⌫**, and numbers you cleared are not
+recorded. At most 64 keys are kept for one calculation; when earlier keys
+were left out, the field starts with `...`. A line typed in the Windows
+terminal interface or on the command line is recorded the same way, so
+`3 4 +` is recorded without `ENTER` and `swap` as `SWAP`.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [_log_key, MAX_KEYS, run_line] -->
+<!-- Verified from: platform/ios/FinCalc/Adapters/HistoryExport.swift [formatCSV] -->
+<!-- Verified from: platform/ios/FinCalc/Domains/Calc/RpnStack.swift [RpnStack] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/adapters/HistoryExport.kt [write] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [logged, MAX_KEYS] -->
+
 The details differ by platform:
 
-| Platform | Timestamp example | Line endings |
-| --- | --- | --- |
-| Windows | `2026-10-25T14:03:07.512345+00:00` | CRLF |
-| iOS | `2026-10-25T14:03:07Z` | CRLF |
-| Android | `2026-10-25T14:03:07.512Z` (fraction length varies) | LF |
+| Platform | Columns | Timestamp example | Line endings |
+| --- | --- | --- | --- |
+| Windows | `timestamp`, `expression`, `result`, plus `rpn_input` (in development) | `2026-10-25T14:03:07.512345+00:00` | CRLF |
+| iOS | The same | `2026-10-25T14:03:07Z` | CRLF |
+| Android | The same | `2026-10-25T14:03:07.512Z` (fraction length varies) | LF |
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/adapters/history_export.py [write_history_csv] -->
 <!-- Verified from: platform/ios/FinCalc/Adapters/HistoryExport.swift [formatCSV] -->
@@ -747,6 +1044,22 @@ and 24-hour times to the minute:
 
 Results use full saved precision. Exporting an empty tape creates an empty file.
 
+A calculation made in RPN mode (in development) is followed by a line that
+starts with `RPN input:` and lists its keys, in the same form as the
+`rpn_input` column described in
+[Read the Exported CSV File](#read-the-exported-csv-file). The line has no
+time in front of it and is included whichever layout options you choose.
+Calculations made in algebraic entry have no such line:
+
+```text
+2026-11-23
+09:14  3 + 4 = 7
+RPN input: 3 ENTER 4 +
+09:15  7 * 5 = 35
+RPN input: 5 *
+09:16  1 / 3 = 0.3333333333333333333333333333
+```
+
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow._on_export_history] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/dialogs/text_export.py [TextExportSettings] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/text_tape.py [format_text_tape] -->
@@ -767,6 +1080,7 @@ Run from `platform/windows/` as
 | `--tui` | None | Opens the terminal interface. |
 | `--cli` | None, or a command | Alone, opens the persistent calculator prompt. With a command, runs it once. |
 | `calculate EXPRESSION` | A quoted expression | Prints the result, rounded to **Decimal places**, and saves it to history. |
+| `calculate --rpn LINE` | A quoted RPN line, such as `"3 4 +"` | In development. Runs the line on an empty stack, prints the last number on the stack, rounded to **Decimal places**, and saves each calculation to history. See [Type RPN Lines on Windows](#type-rpn-lines-on-windows). |
 | `history` | None | Prints saved history without changing it. |
 | `--help` | None | Shows help for Plain Text Fin Calc or for the command it follows. |
 | `--` | Placed before an expression | Lets an expression start with a minus sign. |
@@ -814,11 +1128,18 @@ fin-calc> config decimal_places full
 fin-calc> config max_history_entries 500
 fin-calc> config max_history_entries unlimited
 fin-calc> config theme light
+fin-calc> config input_mode rpn
+fin-calc rpn> config input_mode algebraic
 ```
 
 Decimal places accepts 0 through 6 or `full`. It changes displayed results
 and history immediately, while calculations and saved results keep full
-precision. History limits accept 1 through 10,000 or `unlimited` and take
+precision. Input mode (in development) accepts `algebraic` or `rpn`; another
+value shows `Error: Input mode must be one of: algebraic, rpn.` It takes
+effect on the next line, changes the prompt to `fin-calc rpn>` in RPN mode,
+and clears the stack; see
+[Type RPN Lines on Windows](#type-rpn-lines-on-windows). History limits
+accept 1 through 10,000 or `unlimited` and take
 effect on the next calculation or restart. A limit that would discard older
 entries asks for confirmation; pressing **Enter** keeps the previous setting.
 Theme accepts `dark` or `light` and affects the graphical interface, not the
@@ -836,6 +1157,8 @@ calculation.
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/repl.py [run_repl, _read_expressions] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/commands.py [show_history] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/settings/commands.py [show_settings, run_config] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/settings/values.py [parse_setting] -->
 
 ### Use Menu Commands
 
@@ -904,6 +1227,30 @@ keys:
 In the Windows terminal interface, **Enter** calculates and saves the entry,
 **Esc** clears the entry field, and **Ctrl+Q** quits. The **±** key has no
 keyboard shortcut. Plain Text Fin Calc for Android has no keyboard shortcuts.
+
+In RPN mode on iOS (in development), **Return** is **ENTER**, **Esc** is
+**C**, and **Delete** is **⌫**. The digit, **.**, operator, and **L** keys
+work as their keypad keys, and **(** and **)** do nothing.
+
+In RPN mode in the Windows graphical window (in development), the keys are:
+
+| Key | What it does in RPN mode |
+| --- | --- |
+| **0**–**9**, **.**, **+**, **-**, **\***, **/**, **^** | Works as that keypad key. |
+| **L** | Works as **log**. |
+| **Enter** or **Return** | Works as **ENTER**. |
+| **S** | Works as **x↔y**. |
+| **D** | Works as **DROP**. |
+| **Esc** | Works as **C**. |
+| **Backspace** | Works as **←**. |
+| **(**, **)** | Shows `Invalid input:` and the key. |
+
+**Help** > **Keyboard Shortcuts** lists the keys of the current input mode.
+In the Windows terminal interface in RPN mode, **Enter** runs the line and
+**Esc** clears the entry field and keeps the stack.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/keypad.py [KeypadView.map_key_press] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/dialogs/help_dialogs.py [RPN_SHORTCUTS_TEXT, show_shortcuts] -->
 
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/root_window.py [RootWindow.keyPressEvent] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/keypad.py [KEY_MAP] -->
@@ -990,7 +1337,8 @@ the next save.
     "twelve_hour": false,
     "seconds": false,
     "utc_offset": false
-  }
+  },
+  "input_mode": "algebraic"
 }
 ```
 
@@ -1000,8 +1348,9 @@ the next save.
 | `theme` | No | `"dark"` or `"light"`. Other values mean dark. |
 | `max_history_entries` | No | `null` for unlimited, or a whole number from 1 to 10,000. Larger numbers are treated as 10,000; a missing or other value means 1,000. |
 | `text_tape` | No | The example shows the defaults. Use `local`, `UTC`, or a named time zone. Supported date formats are `YYYY-MM-DD`, `MM/DD/YYYY`, and `DD/MM/YYYY`. Each missing or invalid option uses its own default. |
+| `input_mode` | No | `"algebraic"` or `"rpn"` (in development). A missing or other value means algebraic. |
 
-<!-- Verified from: platform/windows/plain_text_fin_calc/adapters/settings_store.py [load_settings, _read_optional_bounded_int, _read_history_cap, _read_theme] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/adapters/settings_store.py [load_settings, _read_optional_bounded_int, _read_history_cap, _read_theme, _read_input_mode] -->
 
 `history.json` is a JSON list with one object per calculation, oldest first:
 
@@ -1020,11 +1369,13 @@ the next save.
 | `expression` | Yes | The expression text shown on the tape. |
 | `result` | Yes | The result as text. |
 | `timestamp` | Yes | An ISO 8601 date and time. |
+| `rpn_input` | No | The keys of a calculation made in RPN mode (in development), such as `"3 ENTER 4 +"`. It is saved only for those calculations; leave it out for others. |
 
-If any entry is missing a field or has an unreadable timestamp, Plain Text Fin
-Calc ignores the whole file and starts with empty history.
+If any entry is missing a required field or has an unreadable timestamp, Plain
+Text Fin Calc ignores the whole file and starts with empty history. An
+`rpn_input` value that is not text is ignored.
 
-<!-- Verified from: platform/windows/plain_text_fin_calc/adapters/history_store.py [_load_entries, write_history] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/adapters/history_store.py [_load_entries, _read_rpn_input, write_history] -->
 
 ### Find Windows Log Files
 
@@ -1049,6 +1400,9 @@ you can open.
 | An expression starting with `-` is treated as an option on the Windows command line | The minus sign looks like an option. | Put `--` before the expression, as in `calculate -- "-2 ^ 2"`. |
 | `Invalid input at character` appears | A typed expression contains an unsupported character, such as `x` or `,`. | Use only numbers, `+`, `-`, `*`, `/`, `^`, parentheses, and `log`. |
 | `Invalid input:` and a key appear | The key does not fit at that point in the expression. | See [Enter and Evaluate an Expression](#enter-and-evaluate-an-expression). |
+| `Too few operands` appears in RPN mode (in development) | The key or operator needs more numbers than the stack holds. | Enter the missing number first. See [Calculate in RPN Mode](#calculate-in-rpn-mode). |
+| The **=**, **(**, and **)** keys are missing | **Input mode** is set to **RPN (reverse Polish notation)**. | Use RPN entry, or set **Input mode** to **Algebraic** in the settings. |
+| An expression such as `3 + 4` or `3+4` typed in the Windows terminal interface or at the prompt shows `Too few operands` or `Invalid input:` | **Input mode** is set to RPN (in development), so the line is read as RPN. The prompt then reads `fin-calc rpn>`. | Type an RPN line such as `3 4 +`, or switch back: type `config input_mode algebraic` at the prompt, or change **Input mode** in the graphical window and restart the terminal interface. |
 | `Result out of range` appears | The result is too large or too small for the platform. | See [Understand Precision and Limits](#understand-precision-and-limits). |
 | Saved history is empty after starting | The history file could not be read. | On Windows, check `data/history.json` against [Edit the Windows Data Files](#edit-the-windows-data-files) before your next calculation overwrites it. |
 | Settings returned to their defaults | The settings file was missing or had invalid values. | Choose your settings again. |
@@ -1075,6 +1429,12 @@ you can open.
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/application/CalculatorSession.kt [calculate] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/Formatting.kt [formatResult] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/MainActivity.kt [showMenu] -->
+<!-- Verified from: platform/ios/FinCalc/Domains/Calc/RpnStack.swift [tooFewOperands] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [needing] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/ui/KeypadView.kt [KeypadView] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [RpnStack._require, run_line] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/gui/views/keypad.py [RPN_KEYS] -->
+<!-- Verified from: platform/windows/plain_text_fin_calc/ui/cli/repl.py [_RPN_PROMPT, _run_calculation] -->
 
 ## FAQ
 
@@ -1137,6 +1497,17 @@ Each platform computes logarithms and fractional powers its own way, so the
 <!-- Verified from: platform/ios/FinCalc/Domains/Calc/DecimalMath.swift [DecimalMath] -->
 <!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/DecimalMath.kt [ln, exp] -->
 
+### Do RPN mode and algebraic entry give the same results?
+
+Yes. On the same device, both use the same decimal arithmetic, so a
+calculation made in RPN mode gives the same full-precision result as the same
+calculation in algebraic entry. RPN mode is in Android 0.5.0 and later and
+in development on iOS and Windows; it is not in iOS 1.0.0.
+
+<!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/rpn_stack.py [result_string] -->
+<!-- Verified from: platform/ios/FinCalc/Domains/Calc/RpnStack.swift [RpnStack] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [resultString] -->
+
 ## Feedback
 
 Send bug reports and feature requests to
@@ -1146,7 +1517,7 @@ Send bug reports and feature requests to
 
 | Platform | How to open feedback |
 | --- | --- |
-| Android (in Google Play review) | Choose **⋮** > **Send Feedback**. |
+| Android | Choose **⋮** > **Send Feedback**. |
 | iOS (in App Store review) | Choose **More** > **Send Feedback**. |
 | Windows (in development) | In the graphical window, choose **Help** > **Send Feedback...**. The terminal interface and command line have no feedback screen. |
 
@@ -1159,6 +1530,8 @@ contains.
 
 ## Glossary
 
+- **Algebraic entry**: entering a whole expression, such as `3 + 4`, and
+  then **=**.
 - **CSV**: comma-separated values, a text file format that spreadsheet
   programs can open.
 - **Decimal places**: the number of digits shown after the decimal point.
@@ -1170,12 +1543,16 @@ contains.
   time.
 - **History limit**: the maximum number of calculations Plain Text Fin Calc
   keeps.
+- **RPN (reverse Polish notation)**: entering the numbers first and the
+  operator after them, as in `3 ENTER 4 +`.
 - **Rounding half to even**: rounding a value exactly halfway between two
   choices to the one with an even last digit.
 - **Scientific notation**: writing a number as digits and a power of ten,
   such as `1E+3` for 1,000 or `1E-7` for 0.0000001.
 - **Significant digits**: the digits of a number from its first nonzero
   digit.
+- **Stack**: in RPN mode, the list of up to four numbers waiting to be used.
+  X is the last number and Y the one before it.
 - **Tape**: the list of saved calculations.
 - **Terminal interface**: the Windows interface that runs inside a terminal
   window.
@@ -1183,3 +1560,4 @@ contains.
 <!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/history.py [HistoryEntry] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/domains/calc/formatting.py [format_result] -->
 <!-- Verified from: platform/windows/plain_text_fin_calc/ui/tui/app.py [CalculatorApp] -->
+<!-- Verified from: platform/android/app/src/main/java/com/plaintxtoffice/fincalc/domains/calc/RpnStack.kt [RpnStack] -->

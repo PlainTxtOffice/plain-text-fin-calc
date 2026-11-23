@@ -21,3 +21,12 @@ class TestSettings:
         assert settings.decimal_places == 2
         assert settings.theme == "light"
         assert settings.max_history_entries == 100
+
+    def test_input_mode_defaults_to_algebraic(self):
+        assert Settings().input_mode == "algebraic"
+        assert Settings(input_mode="rpn").input_mode == "rpn"
+
+    def test_positional_construction_still_works(self):
+        settings = Settings(2, "light", None)
+        assert settings.max_history_entries is None
+        assert settings.input_mode == "algebraic"

@@ -8,8 +8,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from plain_text_fin_calc.domains.calc.history import HistoryEntry
+    from plain_text_fin_calc.domains.calc.rpn_stack import RpnStack
 
 MAX_DECIMAL_PLACES = 6
+# Stack level names for text output, X first.
+_LEVEL_NAMES = ("X", "Y", "Z", "T")
 
 
 def format_result(value_str: str, decimal_places: int | None) -> str:
@@ -46,3 +49,21 @@ def format_history_line(entry: HistoryEntry, decimal_places: int | None) -> str:
     full precision.
     """
     return f"{entry.expression} = {format_result(entry.result, decimal_places)}"
+
+
+def format_stack_lines(
+    stack: RpnStack,
+    decimal_places: int | None,
+) -> list[str]:
+    """Render the occupied RPN stack levels, highest first and X last.
+
+    Each line is ``<name>: <value>`` with the value rounded by
+    ``format_result``; the stack keeps full precision. An empty stack gives
+    an empty list. A number still being typed is not shown.
+    """
+    lines = [
+        f"{name}: {format_result(value, decimal_places)}"
+        for name, value in zip(_LEVEL_NAMES, stack.levels, strict=False)
+    ]
+    lines.reverse()
+    return lines

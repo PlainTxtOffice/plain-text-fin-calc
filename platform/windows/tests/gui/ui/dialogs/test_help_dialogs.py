@@ -61,3 +61,38 @@ def test_show_shortcuts_lists_key_bindings(monkeypatch):
     assert "Shortcuts" in captured["title"]
     for token in ("Enter", "Esc", "Backspace", "L — insert log"):
         assert token in captured["text"]
+
+
+def _shown_shortcuts(monkeypatch, *args) -> str:
+    _app()
+    captured: list[str] = []
+    monkeypatch.setattr(
+        help_dialogs.QMessageBox,
+        "information",
+        lambda _parent, _title, text: captured.append(text),
+    )
+    help_dialogs.show_shortcuts(QWidget(), *args)
+    return captured[0]
+
+
+def test_rpn_shortcuts_list_swap_and_drop(monkeypatch):
+    text = _shown_shortcuts(monkeypatch, "rpn")
+    assert text.splitlines() == [
+        "Enter / Return \u2014 ENTER: copy the number onto the stack",
+        "Esc \u2014 clear the number being entered, or the stack",
+        "Backspace \u2014 delete the last digit",
+        "L \u2014 log (base-10 logarithm) of X",
+        "S \u2014 swap X and Y",
+        "D \u2014 drop X",
+        "Digits and operators (0-9 . + - * / ^) \u2014 press keypad buttons",
+    ]
+    assert "( )" not in text
+
+
+def test_default_shortcuts_text_is_the_algebraic_one(monkeypatch):
+    assert _shown_shortcuts(monkeypatch) == help_dialogs.SHORTCUTS_TEXT
+    assert _shown_shortcuts(monkeypatch, "algebraic") == (
+        help_dialogs.SHORTCUTS_TEXT
+    )
+    assert "( )" in help_dialogs.SHORTCUTS_TEXT
+    assert "S \u2014 swap" not in help_dialogs.SHORTCUTS_TEXT

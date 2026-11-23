@@ -18,6 +18,15 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _read_rpn_input(raw: object) -> str | None:
+    """Return saved RPN keys, or None for anything but a non-empty string.
+
+    A missing, null, empty, or wrongly typed value marks an algebraic entry;
+    it never invalidates the entry or the file.
+    """
+    return raw if isinstance(raw, str) and raw else None
+
+
 def _load_entries(raw_entries: object) -> list[HistoryEntry]:
     """Convert decoded JSON into history entries."""
     if not isinstance(raw_entries, list):
@@ -34,6 +43,7 @@ def _load_entries(raw_entries: object) -> list[HistoryEntry]:
                 expression=entry["expression"],
                 result=entry["result"],
                 timestamp=datetime.fromisoformat(entry["timestamp"]),
+                rpn_input=_read_rpn_input(entry.get("rpn_input")),
             ),
         )
     return entries
@@ -71,6 +81,8 @@ def write_history(history: History, path: Path) -> None:
     """Write all history entries to a JSON file.
 
     Log and propagate write failures so callers can report unsaved results.
+    The "rpn_input" key is written only for RPN entries, so algebraic
+    entries keep their earlier three-key form.
 
     Parameters
     ----------
@@ -87,6 +99,7 @@ def write_history(history: History, path: Path) -> None:
             "result": entry.result,
             "timestamp": entry.timestamp.isoformat(),
         }
+        | ({"rpn_input": entry.rpn_input} if entry.rpn_input else {})
         for entry in history.entries
     ]
     try:

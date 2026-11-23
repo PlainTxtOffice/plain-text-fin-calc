@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QHBoxLayout,
+    QLabel,
     QSpinBox,
     QVBoxLayout,
 )
@@ -30,6 +31,12 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
 
     from plain_text_fin_calc.domains.calc.history import HistoryEntry
+
+INPUT_MODE_EXPLANATION = (
+    "In RPN mode, numbers go onto a stack with ENTER and each operator uses "
+    "the last two numbers. Changing the input mode clears the number being "
+    "entered and the stack. History is kept."
+)
 
 
 class SettingsDialog(QDialog):
@@ -63,6 +70,18 @@ class SettingsDialog(QDialog):
             self._precision_combo.findData(settings.decimal_places),
         )
 
+        self._input_mode_combo = QComboBox()
+        self._input_mode_combo.addItem("Algebraic", userData="algebraic")
+        self._input_mode_combo.addItem(
+            "RPN (reverse Polish notation)",
+            userData="rpn",
+        )
+        self._input_mode_combo.setCurrentIndex(
+            self._input_mode_combo.findData(settings.input_mode),
+        )
+        self._input_mode_note = QLabel(INPUT_MODE_EXPLANATION)
+        self._input_mode_note.setWordWrap(True)
+
         self._theme_combo = QComboBox()
         self._theme_combo.addItem("Dark", userData="dark")
         self._theme_combo.addItem("Light", userData="light")
@@ -87,6 +106,8 @@ class SettingsDialog(QDialog):
 
         form = QFormLayout()
         form.addRow("Decimal places:", self._precision_combo)
+        form.addRow("Input mode:", self._input_mode_combo)
+        form.addRow("", self._input_mode_note)
         form.addRow("Theme:", self._theme_combo)
         form.addRow("Max history entries:", cap_row)
 
@@ -115,4 +136,5 @@ class SettingsDialog(QDialog):
             theme=self._theme_combo.currentData(),
             max_history_entries=max_entries,
             text_tape=self._text_export.selected_format(),
+            input_mode=self._input_mode_combo.currentData(),
         )

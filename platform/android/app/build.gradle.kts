@@ -19,8 +19,8 @@ android {
         // Keep the validated API 36 behavior; an API 37 target migration needs separate device testing.
         //noinspection AndroidLintOldTargetApi
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.4.0"
+        versionCode = 7
+        versionName = "0.5.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { buildConfig = true }
@@ -48,7 +48,7 @@ android {
     }
 }
 
-// Names outputs with the app and version, such as plain-text-fin-calc-0.4.0-6-release.aab,
+// Names outputs with the app and version, such as plain-text-fin-calc-0.5.0-7-release.aab,
 // instead of app-release.aab. Must come after android { } because it reads
 // defaultConfig.
 base {

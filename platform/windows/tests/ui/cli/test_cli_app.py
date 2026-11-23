@@ -112,3 +112,81 @@ def test_help_imports_no_toolkits_and_loads_no_state(monkeypatch, args):
         [sys.executable, "-c", code], capture_output=True, text=True
     )
     assert result.returncode == 0, result.stderr
+
+
+def _saved(session):
+    return [
+        (entry.expression, entry.result, entry.rpn_input)
+        for entry in load_history(session.history_path).entries
+    ]
+
+
+def test_calculate_rpn_prints_x_and_saves_keys(session):
+    result = CliRunner().invoke(cli_app.app, ["calculate", "--rpn", "3 4 +"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "7\n"
+    assert _saved(session) == [("3 + 4", "7", "3 4 +")]
+
+
+def test_calculate_rpn_saves_every_calculation_of_the_line(session):
+    result = CliRunner().invoke(
+        cli_app.app, ["calculate", "--rpn", "3 ENTER 4 + 5 *"]
+    )
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "35\n"
+    assert _saved(session) == [
+        ("3 + 4", "7", "3 ENTER 4 +"),
+        ("7 * 5", "35", "5 *"),
+    ]
+
+
+def test_calculate_rpn_negative_first_number_and_no_calculation(session):
+    runner = CliRunner()
+    result = runner.invoke(cli_app.app, ["calculate", "--rpn", "--", "-5 3 *"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "-15\n"
+    result = runner.invoke(cli_app.app, ["calculate", "--rpn", "3 4"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "4\n"
+    assert _saved(session) == [("-5 * 3", "-15", "-5 3 *")]
+
+
+@pytest.mark.parametrize(
+    ("line", "message"),
+    [
+        ("5 0 /", "Error: Division by zero"),
+        ("3 4 + 0 /", "Error: Division by zero"),
+        ("3 drop", "Error: Stack is empty"),
+        ("", "Error: Empty expression"),
+        ("3 x", "Error: Invalid input: x"),
+    ],
+)
+def test_calculate_rpn_error_saves_nothing(session, line, message):
+    result = CliRunner().invoke(cli_app.app, ["calculate", "--rpn", line])
+    assert result.exit_code == 1
+    assert message in result.stderr
+    assert not result.stdout
+    assert not session.history_path.exists()
+
+
+@pytest.mark.parametrize("mode", ["algebraic", "rpn"])
+def test_calculate_ignores_the_saved_input_mode(session, mode):
+    session.settings = Settings(input_mode=mode)
+    runner = CliRunner()
+    result = runner.invoke(cli_app.app, ["calculate", "1 + 2"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "3\n"
+    result = runner.invoke(cli_app.app, ["calculate", "--rpn", "3 4 +"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "7\n"
+    assert _saved(session) == [("1 + 2", "3", None), ("3 + 4", "7", "3 4 +")]
+
+
+def test_calculate_help_describes_rpn_option(monkeypatch):
+    monkeypatch.setattr(
+        commands, "load_session", lambda: pytest.fail("unexpected state load")
+    )
+    result = CliRunner().invoke(cli_app.app, ["calculate", "--help"])
+    assert result.exit_code == 0
+    assert "--rpn" in result.stdout
+    assert "enter, swap, drop, chs, log, clear" in " ".join(result.stdout.split())

@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import json
+
+import pytest
+
 from plain_text_fin_calc.adapters.settings_store import load_settings, write_settings
 from plain_text_fin_calc.config.settings import Settings
 from plain_text_fin_calc.domains.calc.text_tape import TextTapeFormat
@@ -120,3 +124,45 @@ def test_settings_file_constant_lives_in_data_dir():
     from plain_text_fin_calc.config.path_handler import DATA_DIR, SETTINGS_FILE
 
     assert SETTINGS_FILE == DATA_DIR / "settings.json"
+
+
+class TestInputMode:
+    """Tests for the saved input_mode setting."""
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            '{"theme": "light", "decimal_places": 2}',
+            '{"theme": "light", "decimal_places": 2, "input_mode": 7}',
+            '{"theme": "light", "decimal_places": 2, "input_mode": null}',
+            '{"theme": "light", "decimal_places": 2, "input_mode": "other"}',
+            '{"theme": "light", "decimal_places": 2, "input_mode": "RPN"}',
+            '{"theme": "light", "decimal_places": 2, "input_mode": ["rpn"]}',
+        ],
+    )
+    def test_missing_or_invalid_mode_loads_as_algebraic(self, tmp_path, text):
+        path = tmp_path / "settings.json"
+        path.write_text(text, encoding="utf-8")
+        assert load_settings(path) == Settings(
+            decimal_places=2, theme="light", input_mode="algebraic"
+        )
+
+    def test_rpn_mode_loads(self, tmp_path):
+        path = tmp_path / "settings.json"
+        path.write_text('{"input_mode": "rpn"}', encoding="utf-8")
+        assert load_settings(path) == Settings(input_mode="rpn")
+
+    def test_rpn_mode_round_trips_as_a_top_level_key(self, tmp_path):
+        path = tmp_path / "settings.json"
+        original = Settings(decimal_places=4, theme="light", input_mode="rpn")
+        write_settings(original, path)
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        assert raw["input_mode"] == "rpn"
+        assert list(raw)[-1] == "input_mode"
+        assert load_settings(path) == original
+
+    def test_default_mode_is_always_written(self, tmp_path):
+        path = tmp_path / "settings.json"
+        write_settings(Settings(), path)
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        assert raw["input_mode"] == "algebraic"

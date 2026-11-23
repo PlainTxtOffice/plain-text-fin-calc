@@ -9,7 +9,7 @@ import com.plaintxtoffice.fincalc.config.Settings
 import com.plaintxtoffice.fincalc.domains.calc.DecimalMath
 import java.util.Locale
 
-/** Edit only presentation preferences and the history retention cap. */
+/** Edit presentation preferences, the input mode, and the history retention cap. */
 fun showSettings(context: Context, settings: Settings, save: (Settings) -> Unit) {
     val form = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
@@ -41,6 +41,13 @@ fun showSettings(context: Context, settings: Settings, save: (Settings) -> Unit)
         setText(R.string.settings_rounding_explanation)
         setPadding(0, context.dp(4), 0, context.dp(16))
     })
+    val mode = choices(context.getString(R.string.settings_input_mode),
+        listOf(context.getString(R.string.settings_input_mode_algebraic), context.getString(R.string.settings_input_mode_rpn)),
+        if (settings.inputMode == "rpn") 1 else 0)
+    form.addView(TextView(context).apply {
+        setText(R.string.settings_input_mode_explanation)
+        setPadding(0, context.dp(4), 0, context.dp(16))
+    })
     val theme = choices(context.getString(R.string.settings_theme),
         listOf(context.getString(R.string.settings_theme_dark), context.getString(R.string.settings_theme_light)),
         if (settings.theme == "light") 1 else 0)
@@ -66,7 +73,8 @@ fun showSettings(context: Context, settings: Settings, save: (Settings) -> Unit)
                 cap.error = context.getString(R.string.settings_history_limit_error)
             } else {
                 save(Settings(if (places.selectedItemPosition == 0) null else places.selectedItemPosition - 1,
-                    if (theme.selectedItemPosition == 1) "light" else "dark", limit))
+                    if (theme.selectedItemPosition == 1) "light" else "dark", limit,
+                    if (mode.selectedItemPosition == 1) "rpn" else "algebraic"))
                 dialog.dismiss()
             }
         }

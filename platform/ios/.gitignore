@@ -15,3 +15,6 @@ xcuserdata/
 
 # App Review walkthrough recordings, which can show device data
 /review-video/
+
+# App Store screenshots from scripts/capture-store-screenshots.sh
+/assets/store/

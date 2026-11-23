@@ -62,6 +62,7 @@ private struct SettingsRecord: Codable {
         case decimalPlaces = "decimal_places"
         case theme
         case maxHistoryEntries = "max_history_entries"
+        case inputMode = "input_mode"
     }
 
     init(_ settings: Settings) {
@@ -73,6 +74,10 @@ private struct SettingsRecord: Codable {
         let defaults = Settings()
         let theme = (try? container.decode(String.self, forKey: .theme))
             .flatMap(Theme.init(rawValue:))
+        // Anything but the exact stored names means algebraic entry.
+        let inputMode =
+            (try? container.decode(String.self, forKey: .inputMode))
+            .flatMap(InputMode.init(rawValue:))
         settings = Settings(
             decimalPlaces: Self.readBoundedInt(
                 container,
@@ -82,6 +87,7 @@ private struct SettingsRecord: Codable {
             ),
             theme: theme ?? defaults.theme,
             maxHistoryEntries: Self.readHistoryCap(container),
+            inputMode: inputMode ?? defaults.inputMode,
         )
     }
 
@@ -93,6 +99,7 @@ private struct SettingsRecord: Codable {
             settings.maxHistoryEntries,
             forKey: .maxHistoryEntries,
         )
+        try container.encode(settings.inputMode.rawValue, forKey: .inputMode)
     }
 
     /// Return the value clamped to `maximum`, or nil if missing or invalid.

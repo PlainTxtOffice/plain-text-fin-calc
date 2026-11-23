@@ -4,6 +4,7 @@ import UIKit
 /// Scrollable tape of past calculations; tapping one reuses its result.
 struct TapeView: View {
     let entries: [HistoryEntry]
+    var inputMode: InputMode = .algebraic
     let colors: ThemeColors
     let formatResult: (String) -> String
     let onSelect: (String) -> Void
@@ -71,7 +72,11 @@ struct TapeView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isButton)
         .accessibilityLabel("\(entry.expression) equals \(entry.result)")
-        .accessibilityHint("Inserts this result into the expression")
+        .accessibilityHint(
+            inputMode == .rpn
+                ? "Puts this result on the stack"
+                : "Inserts this result into the expression",
+        )
         .contextMenu {
             Button("Use Result", systemImage: "arrow.down.to.line") {
                 onSelect(entry.result)

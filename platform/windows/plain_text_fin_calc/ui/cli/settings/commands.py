@@ -23,15 +23,19 @@ def show_settings(session: CalculatorSession) -> None:
     places = settings.decimal_places
     cap = settings.max_history_entries
     typer.echo(f"decimal_places = {'full' if places is None else places}")
+    typer.echo(f"input_mode = {settings.input_mode}")
     typer.echo(f"max_history_entries = {'unlimited' if cap is None else cap}")
     typer.echo(f"theme = {settings.theme} (graphical interface)")
     typer.echo(
         f"Use config decimal_places <0-{MAX_DECIMAL_PLACES}|full>, "
+        "config input_mode <algebraic|rpn>, "
         f"config max_history_entries <{MIN_HISTORY_CAP}-{MAX_HISTORY_CAP}"
         "|unlimited>, or config theme <dark|light>.\n"
         "Decimal places controls display only; saved results keep full "
-        "calculation precision. History limits apply on the next calculation "
-        "or restart. Theme does not change this console window."
+        "calculation precision. In RPN mode, enter numbers and operators "
+        "separated by spaces, such as 3 4 +. Changing the input mode clears "
+        "the stack. History is kept. History limits apply on the next "
+        "calculation or restart. Theme does not change this console window."
     )
 
 

@@ -7,6 +7,12 @@ enum KeypadKey: Hashable {
     case clear
     case backspace
     case toggleSign
+    /// RPN: finish the number being typed and duplicate it.
+    case enter
+    /// RPN: exchange the X and Y registers.
+    case swap
+    /// RPN: remove the X register.
+    case drop
 
     var label: String {
         switch self {
@@ -15,6 +21,10 @@ enum KeypadKey: Hashable {
         case .clear: "C"
         case .backspace: "\u{232B}"
         case .toggleSign: "\u{00B1}"
+        case .enter: "ENTER"
+        // The variation selector keeps the arrow a text glyph.
+        case .swap: "x\u{2194}\u{FE0E}y"
+        case .drop: "DROP"
         }
     }
 
@@ -34,6 +44,9 @@ enum KeypadKey: Hashable {
         case .clear: "clear"
         case .backspace: "delete"
         case .toggleSign: "change sign"
+        case .enter: "enter"
+        case .swap: "swap x and y"
+        case .drop: "drop"
         }
     }
 
@@ -41,9 +54,14 @@ enum KeypadKey: Hashable {
         switch self {
         case .symbol(let symbol):
             !symbol.allSatisfy(\.isNumber) && symbol != "."
-        case .evaluate: false
-        case .clear, .backspace, .toggleSign: true
+        case .evaluate, .enter: false
+        case .clear, .backspace, .toggleSign, .swap, .drop: true
         }
+    }
+
+    /// True for the tall accent key: `=`, or ENTER in RPN mode.
+    var isAccent: Bool {
+        self == .evaluate || self == .enter
     }
 }
 
@@ -60,15 +78,22 @@ enum KeyLabels {
 /// Grid of calculator keys.
 ///
 /// Four columns of rows sit beside a fifth column whose tall `=` key
-/// spans the bottom three rows, like an adding-machine keyboard.
+/// spans the bottom three rows, like an adding-machine keyboard. In RPN
+/// mode the parenthesis keys become swap and DROP and the tall key ENTER.
 struct KeypadView: View {
+    var inputMode: InputMode = .algebraic
     let colors: ThemeColors
     let onKey: (KeypadKey) -> Void
 
     @State private var tapCount = 0
 
-    private static let rows: [[KeypadKey]] = [
-        [.symbol("log"), .symbol("("), .symbol(")"), .clear],
+    private static let algebraicTopRow: [KeypadKey] = [
+        .symbol("log"), .symbol("("), .symbol(")"), .clear,
+    ]
+    private static let rpnTopRow: [KeypadKey] = [
+        .symbol("log"), .swap, .drop, .clear,
+    ]
+    private static let lowerRows: [[KeypadKey]] = [
         [.symbol("7"), .symbol("8"), .symbol("9"), .symbol("/")],
         [.symbol("4"), .symbol("5"), .symbol("6"), .symbol("*")],
         [.symbol("1"), .symbol("2"), .symbol("3"), .symbol("-")],
@@ -76,15 +101,26 @@ struct KeypadView: View {
     ]
     private static let spacing: CGFloat = 8
 
+    private var keyRows: [[KeypadKey]] {
+        let topRow = inputMode == .rpn
+            ? Self.rpnTopRow : Self.algebraicTopRow
+        return [topRow] + Self.lowerRows
+    }
+
+    private var tallKey: KeypadKey {
+        inputMode == .rpn ? .enter : .evaluate
+    }
+
     var body: some View {
+        let rows = keyRows
         GeometryReader { proxy in
-            let rowCount = CGFloat(Self.rows.count)
+            let rowCount = CGFloat(rows.count)
             let rowHeight =
                 (proxy.size.height - Self.spacing * (rowCount - 1)) / rowCount
             let columnWidth = (proxy.size.width - Self.spacing * 4) / 5
             HStack(spacing: Self.spacing) {
                 VStack(spacing: Self.spacing) {
-                    ForEach(Self.rows, id: \.self) { row in
+                    ForEach(rows, id: \.self) { row in
                         HStack(spacing: Self.spacing) {
                             ForEach(row, id: \.self) { key in
                                 keyButton(key, height: rowHeight)
@@ -96,7 +132,7 @@ struct KeypadView: View {
                     keyButton(.backspace, height: rowHeight)
                     keyButton(.symbol("^"), height: rowHeight)
                     keyButton(
-                        .evaluate,
+                        tallKey,
                         height: rowHeight * 3 + Self.spacing * 2,
                     )
                 }
@@ -115,20 +151,22 @@ struct KeypadView: View {
                 .font(.system(size: 24, weight: .medium, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
+                // Keeps word labels such as ENTER and DROP off the key edges.
+                .padding(.horizontal, 6)
                 .frame(maxWidth: .infinity)
                 .frame(height: max(height, 0))
                 .contentShape(.rect)
         }
         .buttonStyle(KeyButtonStyle(
             background: background(for: key),
-            foreground: key == .evaluate
+            foreground: key.isAccent
                 ? colors.highlightedText : colors.keyText,
         ))
         .accessibilityLabel(key.accessibilityLabel)
     }
 
     private func background(for key: KeypadKey) -> Color {
-        if key == .evaluate { return colors.highlight }
+        if key.isAccent { return colors.highlight }
         return key.isOperator ? colors.operatorKey : colors.key
     }
 }

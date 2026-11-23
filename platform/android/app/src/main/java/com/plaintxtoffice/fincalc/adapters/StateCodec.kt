@@ -31,15 +31,21 @@ object StateCodec {
             bounded(preferences.get("decimal_places"), 0, 6),
             if (preferences.get("theme")?.toString() == "\"light\"") "light" else "dark",
             if (cap?.isJsonNull == true) null else bounded(cap, 1, 10000) ?: 1000,
+            if (preferences.get("input_mode")?.toString() == "\"rpn\"") "rpn" else "algebraic",
         )
         val entries = root.getAsJsonArray("history") ?: JsonArray()
         val history = entries.map { entry ->
             val row = entry.asJsonObject
             HistoryEntry(string(row, "expression"), string(row, "result"),
-                Instant.parse(string(row, "timestamp")))
+                Instant.parse(string(row, "timestamp")), optionalText(row.get("rpn_input")))
         }
         return StoredState(history, settings)
     }
+
+    /** Text that may be absent; a wrong type or empty text counts as absent instead of failing. */
+    private fun optionalText(value: JsonElement?): String? =
+        if (value != null && value.isJsonPrimitive && value.asJsonPrimitive.isString) value.asString.ifEmpty { null }
+        else null
 
     private fun string(row: JsonObject, key: String): String {
         val value = row.get(key)
@@ -54,6 +60,7 @@ object StateCodec {
             addProperty("decimal_places", state.settings.decimalPlaces)
             addProperty("theme", state.settings.theme)
             addProperty("max_history_entries", state.settings.maxHistoryEntries)
+            addProperty("input_mode", state.settings.inputMode)
         }
         val rows = JsonArray()
         state.history.forEach { entry ->
@@ -61,6 +68,8 @@ object StateCodec {
                 addProperty("expression", entry.expression)
                 addProperty("result", entry.result)
                 addProperty("timestamp", entry.timestamp.toString())
+                // Algebraic entries stay as they were written before RPN mode existed.
+                if (!entry.rpnInput.isNullOrEmpty()) addProperty("rpn_input", entry.rpnInput)
             })
         }
         return JsonObject().apply { add("settings", settings); add("history", rows) }.toString()

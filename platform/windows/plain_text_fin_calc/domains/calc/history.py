@@ -25,12 +25,17 @@ class HistoryEntry:
         The Decimal result as a string (e.g. "15").
     timestamp : datetime
         When the calculation was performed.
+    rpn_input : str | None
+        The keys that produced an RPN calculation (e.g. "3 ENTER 4 +").
+        An entry is an RPN entry exactly when this is a non-empty string;
+        algebraic entries have None.
 
     """
 
     expression: str
     result: str
     timestamp: datetime
+    rpn_input: str | None = None
 
 
 @dataclass

@@ -8,6 +8,36 @@ See the [product overview](../../README.md) and
 [user manual](../../docs/USER_MANUAL.md) for application behavior. Shared
 documentation and assets remain at repository level.
 
+## RPN input mode
+
+RPN (reverse Polish notation) is an optional input mode, in development and
+not in a released build. **Algebraic** stays the default. It is saved as
+`"input_mode": "algebraic"` or `"rpn"` in `data/settings.json`.
+
+- Graphical window: choose **Edit** > **Settings...** and set **Input mode**
+  to **RPN (reverse Polish notation)**. The **(**, **)**, and **=** keys
+  become **x↔y**, **DROP**, and **ENTER**, and a **Y:** line appears above
+  the display. On the keyboard, **Enter** is **ENTER**, **S** swaps, **D**
+  drops, **L** is **log**, **Esc** is **C**, and **Backspace** deletes a
+  digit.
+- Persistent prompt (`--cli`): type `config input_mode rpn` or
+  `config input_mode algebraic`. In RPN mode the prompt is `fin-calc rpn>`
+  and each line is a list of numbers, operators (`+ - * / ^`), and the words
+  `enter`, `swap`, `drop`, `chs`, `log`, and `clear`, separated by spaces,
+  such as `3 4 +`. The stack is printed after each line.
+- One-shot command: `calculate --rpn "3 4 +"` runs one line on an empty
+  stack and prints the last number, whatever the saved input mode.
+- Terminal interface (`--tui`): reads the input mode when it starts and takes
+  the same lines as the prompt. It cannot change the setting.
+
+The stack holds four levels and is kept in memory only. Each RPN calculation
+is saved to history as its equivalent algebraic expression and result, with
+the keys in an optional `rpn_input` field. CSV exports carry them in a fourth
+`rpn_input` column, empty for algebraic entries, and plain text exports add an
+`RPN input:` line under each RPN calculation. The
+[user manual](../../docs/USER_MANUAL.md#calculate-in-rpn-mode) has the full
+rules and messages.
+
 ## Development
 
 Run from this directory with Python 3.14 or newer.

@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import com.plaintxtoffice.fincalc.adapters.*
 import com.plaintxtoffice.fincalc.config.Settings
 import com.plaintxtoffice.fincalc.domains.calc.HistoryEntry
-import com.plaintxtoffice.fincalc.domains.calc.formatResult
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.Executors
@@ -18,6 +17,10 @@ import java.util.concurrent.Executors
 data class ScreenState(
     val stored: StoredState = StoredState(), val expression: String = "", val status: String = "Loading…",
     val tokens: List<String> = emptyList(), val pending: Boolean = false, val ready: Boolean = false,
+    /** RPN mode only: the Y register as shown, null when empty; then the stack for saved UI state, X first. */
+    val rpnY: String? = null,
+    val rpnLevels: List<String> = emptyList(), val rpnEntry: String = "", val rpnLift: Boolean = true,
+    val rpnKeys: List<String> = emptyList(),
 )
 
 /** Serialize arithmetic and disk operations off the UI thread; survive Activity recreation. */
@@ -45,10 +48,10 @@ class CalculatorModel(application: Application) : AndroidViewModel(application) 
 
     private fun publish(message: String? = null) {
         val builder = session.builder
-        val expression = if (builder.hasPendingResult() && builder.symbols().size == 1)
-            formatResult(builder.symbols().single(), session.state.settings.decimalPlaces) else builder.display()
-        val snapshot = ScreenState(session.state, expression, message ?: session.status,
-            builder.symbols(), builder.hasPendingResult(), true)
+        val rpn = session.rpn
+        val snapshot = ScreenState(session.state, session.shownExpression(), message ?: session.status,
+            builder.symbols(), builder.hasPendingResult(), true,
+            session.shownY(), rpn.levels, rpn.entry.orEmpty(), rpn.lift, rpn.keys)
         main.post { current = snapshot; onChange?.invoke(snapshot) }
     }
 
@@ -66,7 +69,9 @@ class CalculatorModel(application: Application) : AndroidViewModel(application) 
     fun reuse(entry: HistoryEntry) = submit { session.reuse(entry) }
     fun clearHistory() = submit { session.clearHistory() }
     fun updateSettings(settings: Settings) = submit { session.updateSettings(settings) }
-    fun restore(tokens: List<String>, pending: Boolean) = submit { session.builder.restore(tokens, pending) }
+    fun restore(tokens: List<String>, pending: Boolean) = submit { session.restore(tokens, pending) }
+    fun restoreRpn(levels: List<String>, entry: String, lift: Boolean, keys: List<String>) =
+        submit { session.restoreRpn(levels, entry, lift, keys) }
 
     /** Export reports its own outcome; the shared save message would wrongly mention history. */
     fun export(uri: Uri) = queue.execute {

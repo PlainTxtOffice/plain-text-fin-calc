@@ -81,10 +81,51 @@ struct HistoryTests {
             ),
         ])
         #expect(HistoryExport.formatCSV(history) == """
-            timestamp,expression,result\r
-            1970-01-01T00:00:00Z,1 + 1,2\r
-            1970-01-01T00:00:00Z,"say ""hi"", ok",3\r
+            timestamp,expression,result,rpn_input\r
+            1970-01-01T00:00:00Z,1 + 1,2,\r
+            1970-01-01T00:00:00Z,"say ""hi"", ok",3,\r
 
             """)
+    }
+
+    @Test func csvExportHasRPNInputColumn() throws {
+        let style = Date.ISO8601FormatStyle()
+        let history = History(entries: [
+            HistoryEntry(
+                expression: "1 / 3",
+                result: "0.3333333333333333333333333333",
+                timestamp: try style.parse("2026-11-23T12:00:00Z"),
+            ),
+            HistoryEntry(
+                expression: "3 + 4",
+                result: "7",
+                timestamp: try style.parse("2026-11-23T12:00:05Z"),
+                rpnInput: "3 ENTER 4 +",
+            ),
+        ])
+        // The algebraic row ends with an empty last field.
+        #expect(
+            HistoryExport.formatCSV(history)
+                == "timestamp,expression,result,rpn_input\r\n"
+                + "2026-11-23T12:00:00Z,1 / 3,"
+                + "0.3333333333333333333333333333,\r\n"
+                + "2026-11-23T12:00:05Z,3 + 4,7,3 ENTER 4 +\r\n",
+        )
+    }
+
+    @Test func csvExportQuotesRPNInput() {
+        let history = History(entries: [
+            HistoryEntry(
+                expression: "1 + 1",
+                result: "2",
+                timestamp: Date(timeIntervalSince1970: 0),
+                rpnInput: "1, \"ENTER\" +",
+            ),
+        ])
+        #expect(
+            HistoryExport.formatCSV(history)
+                == "timestamp,expression,result,rpn_input\r\n"
+                + "1970-01-01T00:00:00Z,1 + 1,2,\"1, \"\"ENTER\"\" +\"\r\n",
+        )
     }
 }

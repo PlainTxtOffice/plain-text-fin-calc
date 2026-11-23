@@ -11,7 +11,7 @@ description = "Decimal-precision calculator with graphical, terminal, and comman
 readme = "README.md"
 requires-python = ">=3.14"
 license = "MIT"
-authors = [{ name = "Tripp", email = "tripp@plaintxtoffice.com" }]
+authors = [{ name = "Tripp", email = "support@plaintxtoffice.com" }]
 license-files = ["LICENSE"]
 dependencies = ["PySide6>=6.7", "textual>=6.6", "typer>=0.21", "tzdata"]
 

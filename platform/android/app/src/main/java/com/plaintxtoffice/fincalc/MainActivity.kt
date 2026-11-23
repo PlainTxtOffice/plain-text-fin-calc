@@ -21,6 +21,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var model: CalculatorModel
     private lateinit var calculator: CalculatorView
     private var shownTheme: String? = null
+    private var shownMode: String? = null
     private val export = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         if (uri != null) model.export(uri)
     }
@@ -32,6 +33,9 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState != null && !model.current.ready) {
             model.restore(savedInstanceState.getStringArrayList("tokens") ?: emptyList(),
                 savedInstanceState.getBoolean("pending"))
+            model.restoreRpn(savedInstanceState.getStringArrayList("rpn_levels") ?: emptyList(),
+                savedInstanceState.getString("rpn_entry").orEmpty(), savedInstanceState.getBoolean("rpn_lift", true),
+                savedInstanceState.getStringArrayList("rpn_keys") ?: emptyList())
         }
         render(model.current)
     }
@@ -45,16 +49,23 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putStringArrayList("tokens", ArrayList(model.current.tokens))
         outState.putBoolean("pending", model.current.pending)
+        outState.putStringArrayList("rpn_levels", ArrayList(model.current.rpnLevels))
+        outState.putString("rpn_entry", model.current.rpnEntry)
+        outState.putBoolean("rpn_lift", model.current.rpnLift)
+        outState.putStringArrayList("rpn_keys", ArrayList(model.current.rpnKeys))
         super.onSaveInstanceState(outState)
     }
 
     private fun render(state: ScreenState) {
-        if (shownTheme != state.stored.settings.theme) buildViews(state.stored.settings.theme)
+        val settings = state.stored.settings
+        // The keypad and display differ by input mode, so a mode change rebuilds the views like a theme change.
+        if (shownTheme != settings.theme || shownMode != settings.inputMode) buildViews(settings.theme, settings.inputMode)
         calculator.render(state)
     }
 
-    private fun buildViews(theme: String) {
+    private fun buildViews(theme: String, inputMode: String) {
         shownTheme = theme
+        shownMode = inputMode
         val colors = ThemeColors.forName(this, theme)
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(colors.background) }
         val bar = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
@@ -66,7 +77,7 @@ class MainActivity : ComponentActivity() {
             setOnClickListener { showMenu(this) }
         }, LinearLayout.LayoutParams(dp(48), dp(48)))
         root.addView(bar)
-        calculator = CalculatorView(this, colors, model::press, model::reuse)
+        calculator = CalculatorView(this, colors, inputMode, model::press, model::reuse)
         root.addView(calculator, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())

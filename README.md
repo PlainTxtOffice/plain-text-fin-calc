@@ -1,4 +1,4 @@
-<!-- last_updated: 2026-11-22 -->
+<!-- last_updated: 2026-11-23 -->
 <!-- Authoring guidance: dev-docs/specs/README_SPEC.instructions.md -->
 <!-- rumdl-disable MD033 MD041 -->
 <p align="center">
@@ -48,6 +48,15 @@ source under the MIT License.
   offsets.
 - Choose light or dark appearance and full precision or 0–6 displayed decimal
   places. Display rounding leaves saved results unchanged.
+- Use an optional RPN (reverse Polish notation) input mode in the Android app
+  (version 0.5.0 and later); it is in development for iPhone, iPad, and
+  Windows. RPN mode has a four-level stack and **ENTER**, **x↔y**, and
+  **DROP** keys. Results
+  match algebraic entry, each calculation goes on the tape as its equivalent
+  expression, and CSV exports add the keys pressed in an `rpn_input` column.
+  On Windows, the terminal interface and command line take RPN as typed lines
+  such as `3 4 +`, and the plain text tape lists the keys on an `RPN input:`
+  line under each RPN calculation.
 - Use a graphical window, a terminal interface, or a command-line calculator on
   Windows (in development).
 - Send a bug report or feature request from the Android app with

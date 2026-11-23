@@ -51,6 +51,9 @@ class TapeView(QWidget):
         """
         super().__init__(parent)
         self._list = QListWidget()
+        # A focused list would take typed keys for its own item search, so
+        # digits, operators and shortcuts would not reach the calculator.
+        self._list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.restyle(get_theme("dark"))
         self._list.setVerticalScrollMode(
             QAbstractItemView.ScrollMode.ScrollPerPixel,

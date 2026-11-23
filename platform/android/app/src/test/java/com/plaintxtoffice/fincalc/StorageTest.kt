@@ -43,7 +43,7 @@ class StorageTest {
     @Test fun csvQuotesFieldsAndKeepsPrecision() {
         val text = StringWriter()
         HistoryExport.write(listOf(entry.copy(expression = "a,\"b\"\n")), text)
-        assertEquals("timestamp,expression,result\n2026-10-23T12:00:00Z,\"a,\"\"b\"\"\n\",0.3333333333333333333333333333\n", text.toString())
+        assertEquals("timestamp,expression,result,rpn_input\n2026-10-23T12:00:00Z,\"a,\"\"b\"\"\n\",0.3333333333333333333333333333,\n", text.toString())
     }
 
     @Test fun feedbackNamesAppAndroidAndDevice() {

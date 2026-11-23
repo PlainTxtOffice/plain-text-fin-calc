@@ -4,7 +4,8 @@ import os
 /// JSON file persistence for calculator history.
 ///
 /// Uses the same layout as the Windows app: a list of objects with
-/// `expression`, `result`, and ISO 8601 `timestamp` fields.
+/// `expression`, `result`, and ISO 8601 `timestamp` fields. Entries made in
+/// RPN mode also carry an `rpn_input` string with their keystrokes.
 enum HistoryStore {
     private static let logger = Logger(
         subsystem: "com.plaintxtoffice.fincalc",
@@ -67,12 +68,34 @@ private struct HistoryRecord: Codable {
     let expression: String
     let result: String
     let timestamp: String
+    /// Written only for RPN entries, so algebraic entries keep their shape.
+    let rpnInput: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case expression
+        case result
+        case timestamp
+        case rpnInput = "rpn_input"
+    }
 
     init(_ entry: HistoryEntry) {
         expression = entry.expression
         result = entry.result
         timestamp = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
             .format(entry.timestamp)
+        rpnInput = Self.nonEmpty(entry.rpnInput)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        expression = try container.decode(String.self, forKey: .expression)
+        result = try container.decode(String.self, forKey: .result)
+        timestamp = try container.decode(String.self, forKey: .timestamp)
+        // A missing, null, empty, or mistyped value means an algebraic
+        // entry; it never makes the file unreadable.
+        rpnInput = Self.nonEmpty(
+            try? container.decode(String.self, forKey: .rpnInput),
+        )
     }
 
     func toEntry() throws -> HistoryEntry {
@@ -80,7 +103,13 @@ private struct HistoryRecord: Codable {
             expression: expression,
             result: result,
             timestamp: try Self.parseTimestamp(timestamp),
+            rpnInput: rpnInput,
         )
+    }
+
+    private static func nonEmpty(_ text: String?) -> String? {
+        guard let text, !text.isEmpty else { return nil }
+        return text
     }
 
     /// Accept timestamps with or without fractional seconds.
