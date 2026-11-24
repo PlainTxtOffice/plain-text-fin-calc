@@ -8,7 +8,7 @@ enum Links {
     )!
     static let contact = URL(string: "https://plaintxtoffice.com/contact/")!
     /// Bug reports and feature requests.
-    static let feedbackEmail = "support@plaintxtoffice.com"
+    static let feedbackEmail = "feedback@plaintxtoffice.com"
 }
 
 /// Builds the feedback email draft; the sender can see and delete all of it.

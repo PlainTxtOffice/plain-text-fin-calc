@@ -1180,7 +1180,8 @@ have the command.
 
 **Send Feedback** asks how you want to send a bug report or feature request.
 **Email** opens your email app with a message to
-`support@plaintxtoffice.com`, or shows the address if no email app is
+`feedback@plaintxtoffice.com` (`support@plaintxtoffice.com` in Android 0.5.0
+and earlier and in iOS 1.0.0), or shows the address if no email app is
 available. The subject is `Plain Text Fin Calc feedback (Android)` or
 `Plain Text Fin Calc feedback (iOS)`. The message ends with the app version,
 iOS or Android version, and device model, which you can delete before sending.
@@ -1189,7 +1190,7 @@ shows the address if no browser is available.
 On Windows, **Help** > **Send Feedback...** opens a dialog with **Report a
 Bug**, **Request a Feature**, and **Open Contact Form**. **Report a Bug** and
 **Request a Feature** open your email app with a message to
-`support@plaintxtoffice.com`. The subject is
+`feedback@plaintxtoffice.com`. The subject is
 `Plain Text Fin Calc bug report (Windows)` or
 `Plain Text Fin Calc feature request (Windows)`. The message ends with the app
 version, Windows version and build, processor type, and Qt version, which you
@@ -1511,7 +1512,7 @@ in development on iOS and Windows; it is not in iOS 1.0.0.
 ## Feedback
 
 Send bug reports and feature requests to
-[support@plaintxtoffice.com](mailto:support@plaintxtoffice.com) or through the
+[feedback@plaintxtoffice.com](mailto:feedback@plaintxtoffice.com) or through the
 [contact page](https://plaintxtoffice.com/contact/). Each app also has a
 **Send Feedback** screen that prepares an email or opens the contact page:
 

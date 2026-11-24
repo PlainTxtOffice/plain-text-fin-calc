@@ -76,6 +76,6 @@ creates `fin-calc-data/` beside the executable if the folder is writable.
 ## Feedback
 
 Send bug reports and feature requests to
-[support@plaintxtoffice.com](mailto:support@plaintxtoffice.com) or through the
+[feedback@plaintxtoffice.com](mailto:feedback@plaintxtoffice.com) or through the
 [contact form](https://plaintxtoffice.com/contact/), or choose **Help** >
 **Send Feedback...** in the app.

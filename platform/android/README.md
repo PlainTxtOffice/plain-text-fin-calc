@@ -54,7 +54,7 @@ input mode clears the number being entered and the stack; history is kept.
 The **⋮** menu contains Settings, Export History, Clear History, Send
 Feedback, Privacy Policy, and About. Send Feedback offers two choices for bug
 reports and feature requests: Email drafts a message to
-`support@plaintxtoffice.com`, ending with the app version, Android version, and
+`feedback@plaintxtoffice.com`, ending with the app version, Android version, and
 device model, and Contact form opens `https://plaintxtoffice.com/contact/` in a
 browser. Privacy
 Policy opens the Plain Text Office privacy policy in a browser.
@@ -126,7 +126,7 @@ project does not include store submission credentials or upload automation.
 
 Send bug reports and feature requests with **⋮** > **Send Feedback** in the
 app, by email to
-[support@plaintxtoffice.com](mailto:support@plaintxtoffice.com), or through the
+[feedback@plaintxtoffice.com](mailto:feedback@plaintxtoffice.com), or through the
 [contact form](https://plaintxtoffice.com/contact/).
 
 ## License

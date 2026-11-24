@@ -24,7 +24,7 @@ struct FeedbackTests {
         let components = try #require(
             URLComponents(url: url, resolvingAgainstBaseURL: false),
         )
-        #expect(components.path == "support@plaintxtoffice.com")
+        #expect(components.path == "feedback@plaintxtoffice.com")
         #expect(components.queryItems == [
             URLQueryItem(name: "subject", value: "Plain Text Fin Calc feedback (iOS)"),
             URLQueryItem(name: "body", value: "\n\n---\nFin Calc"),

@@ -122,7 +122,7 @@ troubleshooting.
 ## Feedback
 
 Bug reports and feature requests are welcome. Email
-[support@plaintxtoffice.com](mailto:support@plaintxtoffice.com) or use the
+[feedback@plaintxtoffice.com](mailto:feedback@plaintxtoffice.com) or use the
 [contact form](https://plaintxtoffice.com/contact/) on plaintxtoffice.com. In
 the Android app, choose **Send Feedback** in the **⋮** menu. The iPhone and iPad
 app, in App Store review, has it in the **More** menu, and the Windows app, in

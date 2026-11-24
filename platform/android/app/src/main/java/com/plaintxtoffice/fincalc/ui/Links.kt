@@ -11,7 +11,7 @@ import androidx.core.net.toUri
 const val PRIVACY_POLICY_URL = "https://plaintxtoffice.com/privacy-policy/"
 const val CONTACT_URL = "https://plaintxtoffice.com/contact/"
 /** Bug reports and feature requests; the same support address as the Play listing. */
-const val FEEDBACK_EMAIL = "support@plaintxtoffice.com"
+const val FEEDBACK_EMAIL = "feedback@plaintxtoffice.com"
 /** Same subject format as the other PlainTxtOffice apps; the version goes in the body instead. */
 const val FEEDBACK_SUBJECT = "Plain Text Fin Calc feedback (Android)"
 
