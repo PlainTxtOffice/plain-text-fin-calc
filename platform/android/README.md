@@ -124,9 +124,9 @@ project does not include store submission credentials or upload automation.
 
 ## Feedback
 
-Send bug reports and feature requests with **⋮** > **Send Feedback** in the
-app, by email to
-[feedback@plaintxtoffice.com](mailto:feedback@plaintxtoffice.com), or through the
+Send bug reports and feature requests with **⋮** > **Send Feedback** in the app,
+by email to [feedback@plaintxtoffice.com](mailto:feedback@plaintxtoffice.com),
+or through the
 [contact form](https://plaintxtoffice.com/contact/).
 
 ## License
